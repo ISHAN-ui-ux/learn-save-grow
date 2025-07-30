@@ -28,6 +28,9 @@ const Navigation = () => {
             <a href="#tools" className="text-foreground hover:text-primary transition-colors">
               Tools
             </a>
+            <a href="/chat" className="text-foreground hover:text-primary transition-colors">
+              Chat
+            </a>
             <a href="#learn" className="text-foreground hover:text-primary transition-colors">
               Learn
             </a>
@@ -60,6 +63,9 @@ const Navigation = () => {
               </a>
               <a href="#tools" className="text-foreground hover:text-primary transition-colors">
                 Tools
+              </a>
+              <a href="/chat" className="text-foreground hover:text-primary transition-colors">
+                Chat
               </a>
               <a href="#learn" className="text-foreground hover:text-primary transition-colors">
                 Learn
