@@ -38,8 +38,8 @@ const Navigation = () => {
 
           {/* Desktop CTA */}
           <div className="hidden md:flex items-center space-x-4">
-            <Button variant="ghost">Sign In</Button>
-            <Button variant="default">Get Started</Button>
+            <Button variant="ghost" onClick={() => window.location.href = '/chat'}>Sign In</Button>
+            <Button variant="default" onClick={() => document.getElementById('kids')?.scrollIntoView({ behavior: 'smooth' })}>Get Started</Button>
           </div>
 
           {/* Mobile menu button */}
@@ -71,8 +71,8 @@ const Navigation = () => {
                 Learn
               </a>
               <div className="flex flex-col space-y-2 pt-4">
-                <Button variant="ghost" className="justify-start">Sign In</Button>
-                <Button variant="default" className="justify-start">Get Started</Button>
+                <Button variant="ghost" className="justify-start" onClick={() => window.location.href = '/chat'}>Sign In</Button>
+                <Button variant="default" className="justify-start" onClick={() => document.getElementById('kids')?.scrollIntoView({ behavior: 'smooth' })}>Get Started</Button>
               </div>
             </div>
           </div>
