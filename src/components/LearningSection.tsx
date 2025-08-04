@@ -91,7 +91,7 @@ const LearningSection = () => {
     { 
       title: "Emergency Fund", 
       target: 10000, 
-      current: 6500, 
+      current: 0, 
       icon: Shield, 
       color: "bg-red-500",
       deadline: "6 months"
@@ -99,7 +99,7 @@ const LearningSection = () => {
     { 
       title: "House Down Payment", 
       target: 50000, 
-      current: 23000, 
+      current: 0, 
       icon: Home, 
       color: "bg-blue-500",
       deadline: "2 years"
@@ -107,7 +107,7 @@ const LearningSection = () => {
     { 
       title: "Education Fund", 
       target: 25000, 
-      current: 8500, 
+      current: 0, 
       icon: GraduationCap, 
       color: "bg-purple-500",
       deadline: "4 years"
@@ -145,8 +145,8 @@ const LearningSection = () => {
   ];
 
   const achievements = [
-    { title: "First Savings Goal", description: "Reached your first $100", icon: Trophy, earned: true },
-    { title: "Budget Master", description: "Stayed on budget for 30 days", icon: Target, earned: true },
+    { title: "First Savings Goal", description: "Reached your first $100", icon: Trophy, earned: false },
+    { title: "Budget Master", description: "Stayed on budget for 30 days", icon: Target, earned: false },
     { title: "Smart Spender", description: "Made 10 wise spending decisions", icon: Star, earned: false },
     { title: "Investment Novice", description: "Completed first investment lesson", icon: TrendingUp, earned: false }
   ];
