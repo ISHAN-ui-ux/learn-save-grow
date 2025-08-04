@@ -7,6 +7,7 @@ import Index from "./pages/Index";
 import Lesson from "./pages/Lesson";
 import Chat from "./pages/Chat";
 import Blog from "./pages/Blog";
+import BlogPost from "./pages/BlogPost";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -22,6 +23,7 @@ const App = () => (
           <Route path="/lesson/:lessonId" element={<Lesson />} />
           <Route path="/chat" element={<Chat />} />
           <Route path="/blog" element={<Blog />} />
+          <Route path="/blog/:id" element={<BlogPost />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>
