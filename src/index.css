@@ -106,6 +106,47 @@ All colors MUST be HSL.
   }
 }
 
+/* Professional article styling */
+.article-intro {
+  @apply border-l-4 border-primary pl-6 mb-8;
+}
+
+.article-intro .lead {
+  @apply text-xl leading-relaxed text-foreground font-medium;
+}
+
+.prose blockquote {
+  @apply border-l-4 border-primary bg-muted/50 p-6 rounded-lg my-6 not-italic;
+}
+
+.prose blockquote p {
+  @apply text-foreground font-medium text-lg;
+}
+
+.prose h2 {
+  @apply text-2xl font-bold text-foreground mt-8 mb-4 border-b border-border pb-2;
+}
+
+.prose h3 {
+  @apply text-xl font-semibold text-foreground mt-6 mb-3;
+}
+
+.prose h4 {
+  @apply text-lg font-semibold text-foreground mt-4 mb-2;
+}
+
+.prose ul, .prose ol {
+  @apply my-4;
+}
+
+.prose li {
+  @apply mb-2;
+}
+
+.prose p {
+  @apply mb-4 leading-relaxed;
+}
+
 @layer base {
   * {
     @apply border-border;
