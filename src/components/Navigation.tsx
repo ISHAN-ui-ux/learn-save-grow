@@ -31,7 +31,7 @@ const Navigation = () => {
             <a href="/chat" className="text-foreground hover:text-primary transition-colors">
               Chat
             </a>
-            <a href="#learn" className="text-foreground hover:text-primary transition-colors">
+            <a href="/blog" className="text-foreground hover:text-primary transition-colors">
               Learn
             </a>
           </div>
@@ -67,7 +67,7 @@ const Navigation = () => {
               <a href="/chat" className="text-foreground hover:text-primary transition-colors">
                 Chat
               </a>
-              <a href="#learn" className="text-foreground hover:text-primary transition-colors">
+              <a href="/blog" className="text-foreground hover:text-primary transition-colors">
                 Learn
               </a>
               <div className="flex flex-col space-y-2 pt-4">
