@@ -1,42 +1,63 @@
 import { Button } from "@/components/ui/button";
 import { Menu, X } from "lucide-react";
 import { useState } from "react";
+import { Link, useNavigate, useLocation } from "react-router-dom";
 
 const Navigation = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const navigate = useNavigate();
+  const location = useLocation();
+
+  const handleHomeNavigation = (sectionId: string) => {
+    if (location.pathname !== '/') {
+      navigate('/');
+      // Small delay to ensure page loads before scrolling
+      setTimeout(() => {
+        document.getElementById(sectionId)?.scrollIntoView({ behavior: 'smooth' });
+      }, 100);
+    } else {
+      document.getElementById(sectionId)?.scrollIntoView({ behavior: 'smooth' });
+    }
+  };
 
   return (
     <nav className="fixed top-0 left-0 right-0 bg-background/80 backdrop-blur-md border-b border-border z-50">
       <div className="container mx-auto px-4">
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
-          <div className="flex items-center space-x-2">
+          <Link to="/" className="flex items-center space-x-2">
             <div className="w-8 h-8 bg-gradient-primary rounded-lg flex items-center justify-center">
               <span className="text-white font-bold text-lg">$</span>
             </div>
             <span className="text-xl font-bold text-foreground">FinWise</span>
-          </div>
+          </Link>
 
           {/* Desktop Navigation */}
           <div className="hidden md:flex items-center space-x-8">
-            <a href="#learning" className="text-foreground hover:text-primary transition-colors">
+            <button 
+              onClick={() => handleHomeNavigation('learning')}
+              className="text-foreground hover:text-primary transition-colors"
+            >
               Learning
-            </a>
-            <a href="#tools" className="text-foreground hover:text-primary transition-colors">
+            </button>
+            <button 
+              onClick={() => handleHomeNavigation('tools')}
+              className="text-foreground hover:text-primary transition-colors"
+            >
               Tools
-            </a>
-            <a href="/chat" className="text-foreground hover:text-primary transition-colors">
+            </button>
+            <Link to="/chat" className="text-foreground hover:text-primary transition-colors">
               Chat
-            </a>
-            <a href="/blog" className="text-foreground hover:text-primary transition-colors">
+            </Link>
+            <Link to="/blog" className="text-foreground hover:text-primary transition-colors">
               Blog
-            </a>
+            </Link>
           </div>
 
           {/* Desktop CTA */}
           <div className="hidden md:flex items-center space-x-4">
-            <Button variant="ghost" onClick={() => window.location.href = '/chat'}>Sign In</Button>
-            <Button variant="default" onClick={() => document.getElementById('learning')?.scrollIntoView({ behavior: 'smooth' })}>Get Started</Button>
+            <Button variant="ghost" onClick={() => navigate('/chat')}>Sign In</Button>
+            <Button variant="default" onClick={() => handleHomeNavigation('learning')}>Get Started</Button>
           </div>
 
           {/* Mobile menu button */}
@@ -52,21 +73,47 @@ const Navigation = () => {
         {isMenuOpen && (
           <div className="md:hidden py-4 border-t border-border">
             <div className="flex flex-col space-y-4">
-              <a href="#learning" className="text-foreground hover:text-primary transition-colors">
+              <button 
+                onClick={() => {
+                  setIsMenuOpen(false);
+                  handleHomeNavigation('learning');
+                }}
+                className="text-foreground hover:text-primary transition-colors text-left"
+              >
                 Learning
-              </a>
-              <a href="#tools" className="text-foreground hover:text-primary transition-colors">
+              </button>
+              <button 
+                onClick={() => {
+                  setIsMenuOpen(false);
+                  handleHomeNavigation('tools');
+                }}
+                className="text-foreground hover:text-primary transition-colors text-left"
+              >
                 Tools
-              </a>
-              <a href="/chat" className="text-foreground hover:text-primary transition-colors">
+              </button>
+              <Link 
+                to="/chat" 
+                className="text-foreground hover:text-primary transition-colors"
+                onClick={() => setIsMenuOpen(false)}
+              >
                 Chat
-              </a>
-              <a href="/blog" className="text-foreground hover:text-primary transition-colors">
+              </Link>
+              <Link 
+                to="/blog" 
+                className="text-foreground hover:text-primary transition-colors"
+                onClick={() => setIsMenuOpen(false)}
+              >
                 Blog
-              </a>
+              </Link>
               <div className="flex flex-col space-y-2 pt-4">
-                <Button variant="ghost" className="justify-start" onClick={() => window.location.href = '/chat'}>Sign In</Button>
-                <Button variant="default" className="justify-start" onClick={() => document.getElementById('learning')?.scrollIntoView({ behavior: 'smooth' })}>Get Started</Button>
+                <Button variant="ghost" className="justify-start" onClick={() => {
+                  setIsMenuOpen(false);
+                  navigate('/chat');
+                }}>Sign In</Button>
+                <Button variant="default" className="justify-start" onClick={() => {
+                  setIsMenuOpen(false);
+                  handleHomeNavigation('learning');
+                }}>Get Started</Button>
               </div>
             </div>
           </div>
