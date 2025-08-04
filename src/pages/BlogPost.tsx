@@ -542,6 +542,86 @@ const BlogPost = () => {
       readTime: "14 min read",
       category: "Credit",
       image: "https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?w=800&h=400&fit=crop"
+    },
+    "5": {
+      id: 5,
+      title: "The Gig Economy: Teaching Teens About Modern Work",
+      content: `<div class="article-intro"><p class="lead">The traditional career path is evolving rapidly. Today's teenagers will likely work in the gig economy, manage multiple income streams, and navigate freelance opportunities. Preparing them for this reality requires new financial skills and mindsets.</p></div><h2>Understanding the Modern Workplace</h2><p>The gig economy represents a fundamental shift in how people work and earn money. Instead of traditional full-time employment, many workers now piece together income from multiple sources: freelance projects, part-time jobs, online businesses, and contract work.</p>`,
+      author: "Priya Sharma",
+      date: "March 5, 2024",
+      readTime: "7 min read",
+      category: "Career",
+      image: "https://images.unsplash.com/photo-1552664730-d307ca884978?w=800&h=400&fit=crop"
+    },
+    "6": {
+      id: 6,
+      title: "Emergency Funds for Families: Getting Started",
+      content: `<div class="article-intro"><p class="lead">Financial emergencies can happen to anyone at any time. Teaching children about emergency funds helps them understand the importance of financial preparedness and provides peace of mind for the entire family.</p></div><h2>Why Emergency Funds Matter</h2><p>An emergency fund is money set aside specifically for unexpected expenses or financial hardships. This could include medical bills, car repairs, job loss, or other unforeseen circumstances that require immediate financial resources.</p>`,
+      author: "Lisa Wang",
+      date: "March 3, 2024",
+      readTime: "6 min read",
+      category: "Emergency Planning",
+      image: "https://images.unsplash.com/photo-1607863680198-23d4b2565df0?w=800&h=400&fit=crop"
+    },
+    "7": {
+      id: 7,
+      title: "Investment Basics: Teaching Kids About the Stock Market",
+      content: `<div class="article-intro"><p class="lead">Introducing children to investing concepts early can set them up for long-term financial success. While the stock market may seem complex, age-appropriate education can make investing accessible and understandable.</p></div><h2>Starting with the Basics</h2><p>Before diving into specific investments, children need to understand what investing means: putting money into something with the expectation that it will grow over time. This concept applies to stocks, bonds, real estate, and even education.</p>`,
+      author: "Ishan Nallani",
+      date: "March 1, 2024",
+      readTime: "9 min read",
+      category: "Investing",
+      image: "https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?w=800&h=400&fit=crop"
+    },
+    "8": {
+      id: 8,
+      title: "Financial Planning for Single Parents",
+      content: `<div class="article-intro"><p class="lead">Single parents face unique financial challenges while raising children. Balancing immediate needs with long-term financial goals requires strategic planning and creative solutions.</p></div><h2>The Single Parent Financial Reality</h2><p>Managing finances as a single parent means handling all financial decisions alone while often having limited time and resources. This requires efficient systems and clear priorities.</p>`,
+      author: "Arvind Vivekanandan",
+      date: "February 28, 2024",
+      readTime: "11 min read",
+      category: "Family Finance",
+      image: "https://images.unsplash.com/photo-1544027993-37dbfe43562a?w=800&h=400&fit=crop"
+    },
+    "9": {
+      id: 9,
+      title: "Teaching Teenagers About Taxes and Income",
+      content: `<div class="article-intro"><p class="lead">Tax education is often overlooked in financial literacy programs, yet understanding taxes is crucial for financial success. Teaching teenagers about taxes early helps them make informed decisions about income and spending.</p></div><h2>Tax Basics for Beginners</h2><p>Taxes are fees that governments collect to fund public services like schools, roads, and emergency services. Understanding how taxes work helps teenagers make better financial decisions throughout their lives.</p>`,
+      author: "Robert Johnson",
+      date: "February 25, 2024",
+      readTime: "8 min read",
+      category: "Taxes",
+      image: "https://images.unsplash.com/photo-1554224154-26032fbc4d72?w=800&h=400&fit=crop"
+    },
+    "10": {
+      id: 10,
+      title: "Digital Banking Safety for Kids and Teens",
+      content: `<div class="article-intro"><p class="lead">As banking moves increasingly online, teaching children about digital financial safety becomes crucial. Cybersecurity practices for financial accounts can protect them from fraud and identity theft.</p></div><h2>The Digital Banking Landscape</h2><p>Modern banking happens primarily through smartphones and computers. While this offers convenience, it also creates new security challenges that children need to understand and navigate safely.</p>`,
+      author: "Sarah Mitchell",
+      date: "February 22, 2024",
+      readTime: "6 min read",
+      category: "Digital Safety",
+      image: "https://images.unsplash.com/photo-1563013544-824ae1b704d3?w=800&h=400&fit=crop"
+    },
+    "11": {
+      id: 11,
+      title: "College Savings Plans: 529 vs Other Options",
+      content: `<div class="article-intro"><p class="lead">Education costs continue to rise, making college savings planning more important than ever. Understanding different savings options helps families choose the best strategy for their situation.</p></div><h2>The Rising Cost of Education</h2><p>College expenses have increased dramatically over the past decades. Families need to start planning early and understand all available savings options to make higher education affordable.</p>`,
+      author: "Michael Davis",
+      date: "February 20, 2024",
+      readTime: "10 min read",
+      category: "Education Finance",
+      image: "https://images.unsplash.com/photo-1523050854058-8df90110c9f1?w=800&h=400&fit=crop"
+    },
+    "12": {
+      id: 12,
+      title: "Teaching Kids About Global Economics",
+      content: `<div class="article-intro"><p class="lead">In our interconnected world, understanding global economics helps children grasp how world events affect their personal finances and local communities.</p></div><h2>Economics in Everyday Life</h2><p>Global economic events impact everything from gas prices to job availability. Teaching children these connections helps them understand the broader context of their financial decisions.</p>`,
+      author: "Dr. Elena Rodriguez",
+      date: "February 18, 2024",
+      readTime: "7 min read",
+      category: "Economics",
+      image: "https://images.unsplash.com/photo-1611224923853-80b023f02d71?w=800&h=400&fit=crop"
     }
   };
 
