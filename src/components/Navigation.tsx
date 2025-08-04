@@ -19,11 +19,8 @@ const Navigation = () => {
 
           {/* Desktop Navigation */}
           <div className="hidden md:flex items-center space-x-8">
-            <a href="#kids" className="text-foreground hover:text-primary transition-colors">
-              For Kids
-            </a>
-            <a href="#adults" className="text-foreground hover:text-primary transition-colors">
-              For Adults
+            <a href="#learning" className="text-foreground hover:text-primary transition-colors">
+              Learning
             </a>
             <a href="#tools" className="text-foreground hover:text-primary transition-colors">
               Tools
@@ -32,14 +29,14 @@ const Navigation = () => {
               Chat
             </a>
             <a href="/blog" className="text-foreground hover:text-primary transition-colors">
-              Learn
+              Blog
             </a>
           </div>
 
           {/* Desktop CTA */}
           <div className="hidden md:flex items-center space-x-4">
             <Button variant="ghost" onClick={() => window.location.href = '/chat'}>Sign In</Button>
-            <Button variant="default" onClick={() => document.getElementById('kids')?.scrollIntoView({ behavior: 'smooth' })}>Get Started</Button>
+            <Button variant="default" onClick={() => document.getElementById('learning')?.scrollIntoView({ behavior: 'smooth' })}>Get Started</Button>
           </div>
 
           {/* Mobile menu button */}
@@ -55,11 +52,8 @@ const Navigation = () => {
         {isMenuOpen && (
           <div className="md:hidden py-4 border-t border-border">
             <div className="flex flex-col space-y-4">
-              <a href="#kids" className="text-foreground hover:text-primary transition-colors">
-                For Kids
-              </a>
-              <a href="#adults" className="text-foreground hover:text-primary transition-colors">
-                For Adults
+              <a href="#learning" className="text-foreground hover:text-primary transition-colors">
+                Learning
               </a>
               <a href="#tools" className="text-foreground hover:text-primary transition-colors">
                 Tools
@@ -68,11 +62,11 @@ const Navigation = () => {
                 Chat
               </a>
               <a href="/blog" className="text-foreground hover:text-primary transition-colors">
-                Learn
+                Blog
               </a>
               <div className="flex flex-col space-y-2 pt-4">
                 <Button variant="ghost" className="justify-start" onClick={() => window.location.href = '/chat'}>Sign In</Button>
-                <Button variant="default" className="justify-start" onClick={() => document.getElementById('kids')?.scrollIntoView({ behavior: 'smooth' })}>Get Started</Button>
+                <Button variant="default" className="justify-start" onClick={() => document.getElementById('learning')?.scrollIntoView({ behavior: 'smooth' })}>Get Started</Button>
               </div>
             </div>
           </div>
