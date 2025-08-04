@@ -230,26 +230,12 @@ const Blog = () => {
         </div>
       </section>
 
-      {/* All Articles Section */}
-      <section className="py-12 bg-muted/50">
-        <div className="container mx-auto px-4">
-          <h2 className="text-3xl font-bold text-foreground mb-8">All Articles</h2>
-          
-          {/* Category Filter */}
-          <div className="flex flex-wrap gap-2 mb-8">
-            {categories.map((category) => (
-              <Button 
-                key={category} 
-                variant="outline" 
-                size="sm"
-                className="hover:bg-primary hover:text-primary-foreground"
-              >
-                {category}
-              </Button>
-            ))}
-          </div>
+          {/* All Articles Section */}
+          <section className="py-12 bg-muted/50">
+            <div className="container mx-auto px-4">
+              <h2 className="text-3xl font-bold text-foreground mb-8">All Articles</h2>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {displayedArticles.map((article) => (
               <Link key={article.id} to={`/blog/${article.id}`}>
                 <Card className="group hover:shadow-lg transition-shadow cursor-pointer h-full">
