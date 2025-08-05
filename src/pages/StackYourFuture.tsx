@@ -381,6 +381,17 @@ const StackYourFuture = () => {
     }
   }, [currentYear, netWorth]);
 
+  // Investment lessons data
+  const investmentLessons: { [key: string]: string } = {
+    "savings": "💡 Savings Account: Very low interest (around 2%) but your money is safe and FDIC insured up to $250k. Perfect for emergency funds and rainy days - you won't lose money here!",
+    "cd": "💡 Certificate of Deposit (CD): Higher interest than savings (around 3.5%) but your money is locked up for a set period. Early withdrawal means penalties. Safe and predictable returns.",
+    "index": "💡 Index Fund: Diversified investment tracking the entire market (around 8% average). Lower risk than individual stocks because you own a piece of many companies. Great for long-term growth!",
+    "strong-oil": "💡 Individual Stocks: Higher potential returns (10-15%) but much riskier. Stock prices fluctuate daily based on company performance and market sentiment. Can lose significant value quickly!",
+    "bonds": "💡 Government Bonds: Very safe investment backed by the government (around 2.5%). Lower returns but extremely stable. Good for preserving capital during volatile times.",
+    "wheat": "💡 Commodities: Physical goods like wheat, oil, gold (15-20% potential). Highly volatile and affected by weather, politics, and global events. High risk, high reward!",
+    "gold": "💡 Gold Investment: Precious metal that often holds value during economic uncertainty (around 20% potential). Volatile but historically a hedge against inflation and market crashes."
+  };
+
   // Check for unlocking new investments
   useEffect(() => {
     const unlockThresholds = [
@@ -396,9 +407,13 @@ const StackYourFuture = () => {
         setInvestments(prev => prev.map(inv => 
           inv.id === id ? { ...inv, unlocked: true } : inv
         ));
+        
+        // Show lesson when unlocking
+        const lesson = investmentLessons[id];
         toast({
           title: "🔓 New Investment Unlocked!",
-          description: `You can now invest in ${name}! Net worth: $${netWorth.toLocaleString()}`,
+          description: `${name} is now available! ${lesson}`,
+          duration: 8000
         });
       }
     });
