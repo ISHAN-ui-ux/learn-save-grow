@@ -5,6 +5,7 @@ import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { 
   PiggyBank, 
   TrendingUp, 
@@ -17,7 +18,11 @@ import {
   Award,
   Briefcase,
   ArrowLeft,
-  AlertTriangle
+  AlertTriangle,
+  Target,
+  Star,
+  Medal,
+  Crown
 } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
@@ -42,6 +47,15 @@ interface RandomEvent {
   description: string;
   amount: number;
   paymentOptions: string[];
+}
+
+interface Achievement {
+  id: string;
+  title: string;
+  description: string;
+  icon: any;
+  earned: boolean;
+  condition: (gameState: any) => boolean;
 }
 
 const randomEvents: RandomEvent[] = [
@@ -77,9 +91,8 @@ const randomEvents: RandomEvent[] = [
 
 const StackYourFuture = () => {
   const [currentYear, setCurrentYear] = useState(1);
-  const [currentPeriod, setCurrentPeriod] = useState(1); // 1 or 2 (6-month periods per year)
+  const [currentPeriod, setCurrentPeriod] = useState(1);
   const [pocketCash, setPocketCash] = useState(5000.00);
-  const [totalInvested, setTotalInvested] = useState(0);
   const [showRandomEvent, setShowRandomEvent] = useState(false);
   const [currentEvent, setCurrentEvent] = useState<RandomEvent | null>(null);
   const [showInvestmentDialog, setShowInvestmentDialog] = useState(false);
@@ -87,6 +100,75 @@ const StackYourFuture = () => {
   const [investmentAmount, setInvestmentAmount] = useState("");
   const [actionType, setActionType] = useState("");
   const { toast } = useToast();
+
+  const achievements: Achievement[] = [
+    {
+      id: "first-investment",
+      title: "First Investment",
+      description: "Made your first investment in any asset",
+      icon: Trophy,
+      earned: false,
+      condition: (state) => state.totalInvested > 0
+    },
+    {
+      id: "diversified-portfolio",
+      title: "Diversified Portfolio",
+      description: "Invested in at least 4 different types of assets",
+      icon: Star,
+      earned: false,
+      condition: (state) => state.investments.filter((inv: Investment) => inv.balance > 0).length >= 4
+    },
+    {
+      id: "first-profit",
+      title: "Profit Maker",
+      description: "Achieved your first positive return on any investment",
+      icon: TrendingUp,
+      earned: false,
+      condition: (state) => state.investments.some((inv: Investment) => inv.profit > 0)
+    },
+    {
+      id: "year-5",
+      title: "Five Year Milestone",
+      description: "Reached year 5 of your investment journey",
+      icon: Medal,
+      earned: false,
+      condition: (state) => state.currentYear >= 5
+    },
+    {
+      id: "net-worth-10k",
+      title: "Ten Grand Club",
+      description: "Achieved a net worth of $10,000",
+      icon: PiggyBank,
+      earned: false,
+      condition: (state) => state.netWorth >= 10000
+    },
+    {
+      id: "stock-master",
+      title: "Stock Market Master",
+      description: "Own shares in at least 3 different stocks",
+      icon: Building,
+      earned: false,
+      condition: (state) => state.investments.filter((inv: Investment) => inv.type === "stock" && (inv.shares || 0) > 0).length >= 3
+    },
+    {
+      id: "year-10",
+      title: "Decade Investor",
+      description: "Completed 10 years of investing",
+      icon: Award,
+      earned: false,
+      condition: (state) => state.currentYear >= 10
+    },
+    {
+      id: "net-worth-50k",
+      title: "Wealth Builder",
+      description: "Achieved a net worth of $50,000",
+      icon: Crown,
+      earned: false,
+      condition: (state) => state.netWorth >= 50000
+    }
+  ];
+
+  const [earnedAchievements, setEarnedAchievements] = useState<string[]>([]);
 
   const [investments, setInvestments] = useState<Investment[]>([
     {
@@ -169,13 +251,34 @@ const StackYourFuture = () => {
     }
   ]);
 
-  // Calculate net worth
+  // Calculate net worth and total invested
   const netWorth = pocketCash + investments.reduce((total, inv) => total + inv.balance + inv.profit, 0);
+  const totalInvested = investments.reduce((total, inv) => total + inv.balance, 0);
+
+  // Check achievements
+  const checkAchievements = () => {
+    const gameState = { currentYear, netWorth, totalInvested, investments, pocketCash };
+    
+    achievements.forEach(achievement => {
+      if (!earnedAchievements.includes(achievement.id) && achievement.condition(gameState)) {
+        setEarnedAchievements(prev => [...prev, achievement.id]);
+        toast({
+          title: "🎉 Achievement Unlocked!",
+          description: `${achievement.title}: ${achievement.description}`,
+        });
+      }
+    });
+  };
+
+  // Check achievements after any state change
+  useEffect(() => {
+    checkAchievements();
+  }, [currentYear, netWorth, totalInvested, investments]);
 
   // Random event trigger
   useEffect(() => {
     const eventChance = Math.random();
-    if (eventChance < 0.15 && currentPeriod === 2) { // 15% chance each year
+    if (eventChance < 0.15 && currentPeriod === 2) {
       const randomEvent = randomEvents[Math.floor(Math.random() * randomEvents.length)];
       setCurrentEvent(randomEvent);
       setShowRandomEvent(true);
@@ -186,7 +289,6 @@ const StackYourFuture = () => {
   const advanceTime = () => {
     if (currentPeriod === 1) {
       setCurrentPeriod(2);
-      // Add semi-annual income
       setPocketCash(prev => prev + 1000);
       toast({
         title: "Income Received",
@@ -195,12 +297,8 @@ const StackYourFuture = () => {
     } else {
       setCurrentPeriod(1);
       setCurrentYear(prev => prev + 1);
-      // Add semi-annual income
       setPocketCash(prev => prev + 1000);
-      
-      // Update investment profits
       updateInvestmentProfits();
-      
       toast({
         title: "New Year Started",
         description: `Welcome to Year ${currentYear + 1}! You received $1,000.`
@@ -216,17 +314,17 @@ const StackYourFuture = () => {
         case "savings":
         case "cd":
         case "bonds":
-          profitChange = inv.balance * (inv.interestRate || 0.02) * 0.5; // Semi-annual
+          profitChange = inv.balance * (inv.interestRate || 0.02) * 0.5;
           break;
         case "index":
-          profitChange = inv.balance * (Math.random() * 0.2 - 0.05); // -5% to +15% annually
+          profitChange = inv.balance * (Math.random() * 0.2 - 0.05);
           break;
         case "stock":
           const volatility = inv.trend === "up" ? 0.3 : -0.1;
           profitChange = inv.balance * (Math.random() * 0.4 - 0.2 + volatility);
           break;
         case "commodity":
-          profitChange = inv.balance * (Math.random() * 0.3 - 0.15); // More volatile
+          profitChange = inv.balance * (Math.random() * 0.3 - 0.15);
           break;
       }
       
@@ -239,7 +337,7 @@ const StackYourFuture = () => {
     
     const amount = Math.abs(currentEvent.amount);
     
-    if (currentEvent.amount > 0) { // Expense
+    if (currentEvent.amount > 0) {
       switch (choice) {
         case "Pay from Cash":
           if (pocketCash >= amount) {
@@ -265,7 +363,7 @@ const StackYourFuture = () => {
         default:
           toast({ title: "Risky Choice", description: "This may affect your credit score!" });
       }
-    } else { // Income
+    } else {
       switch (choice) {
         case "Add to Cash":
           setPocketCash(prev => prev + amount);
@@ -364,158 +462,226 @@ const StackYourFuture = () => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-amber-50 to-orange-100 p-4">
       <div className="max-w-7xl mx-auto">
-        {/* Header */}
-        <div className="flex items-center gap-4 mb-6">
-          <Link to="/">
-            <Button variant="outline" size="sm">
-              <ArrowLeft className="h-4 w-4 mr-2" />
-              Back to Home
-            </Button>
-          </Link>
-          <h1 className="text-3xl font-bold text-primary">Stack Your Future</h1>
-          <Button onClick={advanceTime} className="ml-auto">
-            Advance to {currentPeriod === 1 ? "Period 2" : `Year ${currentYear + 1}`}
-          </Button>
-        </div>
+        <Tabs defaultValue="game" className="w-full">
+          <TabsList className="grid w-full grid-cols-2 mb-6">
+            <TabsTrigger value="game">Investment Game</TabsTrigger>
+            <TabsTrigger value="achievements">Achievements</TabsTrigger>
+          </TabsList>
 
-        <div className="grid grid-cols-12 gap-6">
-          {/* Left Sidebar */}
-          <div className="col-span-3 space-y-4">
-            {/* Year Progress */}
-            <Card className="bg-slate-700 text-white">
-              <CardHeader className="pb-2">
-                <div className="text-sm opacity-90">YEAR {currentYear} PERIOD {currentPeriod} OF 20</div>
-                <Progress value={((currentYear - 1 + (currentPeriod - 1) * 0.5) / 20) * 100} className="h-2" />
-              </CardHeader>
-            </Card>
-
-            {/* Pig Character */}
-            <Card className="bg-gradient-to-br from-pink-100 to-pink-200">
-              <CardContent className="p-4 text-center">
-                <PiggyBank className="h-16 w-16 mx-auto mb-2 text-pink-600" />
-                <div className="bg-white rounded-lg p-2 text-sm">
-                  "Smart investing in year {currentYear}!"
-                </div>
-              </CardContent>
-            </Card>
-
-            {/* Financial Info */}
-            <Card className="bg-slate-700 text-white">
-              <CardContent className="p-4">
-                <div className="space-y-3">
-                  <div>
-                    <div className="text-sm opacity-90">POCKET CASH</div>
-                    <div className="text-xl font-bold text-green-400">
-                      ${pocketCash.toLocaleString(undefined, { minimumFractionDigits: 2 })}
-                    </div>
-                  </div>
-                  <div>
-                    <div className="text-sm opacity-90">OVERALL NET WORTH</div>
-                    <div className="text-xl font-bold text-green-400">
-                      ${netWorth.toLocaleString(undefined, { minimumFractionDigits: 2 })}
-                    </div>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-
-            {/* Navigation Links */}
-            <Card className="bg-slate-700 text-white">
-              <CardContent className="p-4">
-                <div className="space-y-2">
-                  <Button variant="ghost" className="w-full justify-start text-white hover:bg-slate-600">
-                    <Trophy className="h-4 w-4 mr-2" />
-                    LEADERBOARD
-                  </Button>
-                  <Button variant="ghost" className="w-full justify-start text-white hover:bg-slate-600">
-                    <Award className="h-4 w-4 mr-2" />
-                    ACHIEVEMENTS
-                  </Button>
-                  <Button variant="ghost" className="w-full justify-start text-white hover:bg-slate-600">
-                    <Briefcase className="h-4 w-4 mr-2" />
-                    PORTFOLIO
-                  </Button>
-                </div>
-              </CardContent>
-            </Card>
-          </div>
-
-          {/* Investment Grid */}
-          <div className="col-span-9">
-            <div className="grid grid-cols-3 gap-4">
-              {investments.map((investment) => (
-                <Card key={investment.id} className="bg-gradient-to-br from-amber-100 to-orange-200 border-2 border-amber-300">
+          <TabsContent value="game">
+            <div className="grid grid-cols-12 gap-6">
+              {/* Left Sidebar */}
+              <div className="col-span-3 space-y-4">
+                {/* Year Progress */}
+                <Card className="bg-slate-700 text-white">
                   <CardHeader className="pb-2">
-                    <div className="flex items-center justify-between">
-                      <CardTitle className="text-sm font-bold text-slate-700">
-                        {investment.title}
-                      </CardTitle>
-                      {investment.type === "stock" && (
-                        <div className={`text-xs px-2 py-1 rounded ${
-                          investment.trend === "up" ? "bg-green-200 text-green-800" : "bg-red-200 text-red-800"
-                        }`}>
-                          {investment.trend === "up" ? "↗" : "↘"}
-                        </div>
-                      )}
-                    </div>
+                    <div className="text-sm opacity-90">YEAR {currentYear} PERIOD {currentPeriod} OF 20</div>
+                    <Progress value={((currentYear - 1 + (currentPeriod - 1) * 0.5) / 20) * 100} className="h-2" />
                   </CardHeader>
-                  <CardContent className="space-y-3">
-                    {/* Investment Icon */}
-                    <div className="flex justify-center">
-                      {investment.type === "savings" && <Building className="h-8 w-8 text-blue-600" />}
-                      {investment.type === "cd" && <CreditCard className="h-8 w-8 text-purple-600" />}
-                      {investment.type === "index" && <TrendingUp className="h-8 w-8 text-red-600" />}
-                      {investment.type === "stock" && <TrendingUp className="h-8 w-8 text-slate-600" />}
-                      {investment.type === "bonds" && <Building className="h-8 w-8 text-green-600" />}
-                      {investment.type === "commodity" && investment.title.includes("WHEAT") && <Wheat className="h-8 w-8 text-yellow-600" />}
-                      {investment.type === "commodity" && investment.title.includes("GOLD") && <Coins className="h-8 w-8 text-yellow-600" />}
-                    </div>
+                </Card>
 
-                    {/* Investment Details */}
-                    <div className="text-center space-y-1">
-                      <div>
-                        <div className="text-xs text-slate-600">BALANCE</div>
-                        <div className="font-bold">${investment.balance.toLocaleString(undefined, { minimumFractionDigits: 2 })}</div>
-                      </div>
-                      {investment.shares !== undefined && (
-                        <div>
-                          <div className="text-xs text-slate-600">SHARES</div>
-                          <div className="font-bold">{investment.shares}</div>
-                        </div>
-                      )}
-                      <div>
-                        <div className="text-xs text-slate-600">PROFIT/LOSS</div>
-                        <div className={`font-bold ${investment.profit >= 0 ? "text-green-600" : "text-red-600"}`}>
-                          {investment.profit >= 0 ? "+" : "-"}${Math.abs(investment.profit).toLocaleString(undefined, { minimumFractionDigits: 2 })}
-                        </div>
-                      </div>
-                      {investment.price && (
-                        <div>
-                          <div className="text-xs text-slate-600">PRICE</div>
-                          <div className="text-xs">${investment.price.toFixed(2)}</div>
-                        </div>
-                      )}
-                    </div>
-
-                    {/* Action Buttons */}
-                    <div className="space-y-2">
-                      {getInvestmentActions(investment.type).map((action) => (
-                        <Button 
-                          key={action} 
-                          size="sm" 
-                          className="w-full bg-orange-600 hover:bg-orange-700 text-white"
-                          onClick={() => openInvestmentDialog(investment, action)}
-                        >
-                          {action}
-                        </Button>
-                      ))}
+                {/* Pig Character */}
+                <Card className="bg-gradient-to-br from-pink-100 to-pink-200">
+                  <CardContent className="p-4 text-center">
+                    <PiggyBank className="h-16 w-16 mx-auto mb-2 text-pink-600" />
+                    <div className="bg-white rounded-lg p-2 text-sm">
+                      "Smart investing in year {currentYear}!"
                     </div>
                   </CardContent>
                 </Card>
-              ))}
+
+                {/* Financial Info */}
+                <Card className="bg-slate-700 text-white">
+                  <CardContent className="p-4">
+                    <div className="space-y-3">
+                      <div>
+                        <div className="text-sm opacity-90">POCKET CASH</div>
+                        <div className="text-xl font-bold text-green-400">
+                          ${pocketCash.toLocaleString(undefined, { minimumFractionDigits: 2 })}
+                        </div>
+                      </div>
+                      <div>
+                        <div className="text-sm opacity-90">OVERALL NET WORTH</div>
+                        <div className="text-xl font-bold text-green-400">
+                          ${netWorth.toLocaleString(undefined, { minimumFractionDigits: 2 })}
+                        </div>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+
+                {/* Navigation Links */}
+                <Card className="bg-slate-700 text-white">
+                  <CardContent className="p-4">
+                    <div className="space-y-2">
+                      <Button variant="ghost" className="w-full justify-start text-white hover:bg-slate-600">
+                        <Trophy className="h-4 w-4 mr-2" />
+                        LEADERBOARD
+                      </Button>
+                      <Button 
+                        variant="ghost" 
+                        className="w-full justify-start text-white hover:bg-slate-600"
+                        onClick={() => {
+                          const achievementsTab = document.querySelector('[value="achievements"]') as HTMLElement;
+                          achievementsTab?.click();
+                        }}
+                      >
+                        <Award className="h-4 w-4 mr-2" />
+                        ACHIEVEMENTS ({earnedAchievements.length}/{achievements.length})
+                      </Button>
+                      <Button variant="ghost" className="w-full justify-start text-white hover:bg-slate-600">
+                        <Briefcase className="h-4 w-4 mr-2" />
+                        PORTFOLIO
+                      </Button>
+                    </div>
+                  </CardContent>
+                </Card>
+              </div>
+
+              {/* Investment Grid */}
+              <div className="col-span-9">
+                {/* Header */}
+                <div className="flex items-center gap-4 mb-6">
+                  <Link to="/">
+                    <Button variant="outline" size="sm">
+                      <ArrowLeft className="h-4 w-4 mr-2" />
+                      Back to Home
+                    </Button>
+                  </Link>
+                  <h1 className="text-3xl font-bold text-primary">Stack Your Future</h1>
+                  <Button onClick={advanceTime} className="ml-auto">
+                    Advance to {currentPeriod === 1 ? "Period 2" : `Year ${currentYear + 1}`}
+                  </Button>
+                </div>
+
+                <div className="grid grid-cols-3 gap-4">
+                  {investments.map((investment) => (
+                    <Card key={investment.id} className="bg-gradient-to-br from-amber-100 to-orange-200 border-2 border-amber-300">
+                      <CardHeader className="pb-2">
+                        <div className="flex items-center justify-between">
+                          <CardTitle className="text-sm font-bold text-slate-700">
+                            {investment.title}
+                          </CardTitle>
+                          {investment.type === "stock" && (
+                            <div className={`text-xs px-2 py-1 rounded ${
+                              investment.trend === "up" ? "bg-green-200 text-green-800" : "bg-red-200 text-red-800"
+                            }`}>
+                              {investment.trend === "up" ? "↗" : "↘"}
+                            </div>
+                          )}
+                        </div>
+                      </CardHeader>
+                      <CardContent className="space-y-3">
+                        {/* Investment Icon */}
+                        <div className="flex justify-center">
+                          {investment.type === "savings" && <Building className="h-8 w-8 text-blue-600" />}
+                          {investment.type === "cd" && <CreditCard className="h-8 w-8 text-purple-600" />}
+                          {investment.type === "index" && <TrendingUp className="h-8 w-8 text-red-600" />}
+                          {investment.type === "stock" && <TrendingUp className="h-8 w-8 text-slate-600" />}
+                          {investment.type === "bonds" && <Building className="h-8 w-8 text-green-600" />}
+                          {investment.type === "commodity" && investment.title.includes("WHEAT") && <Wheat className="h-8 w-8 text-yellow-600" />}
+                          {investment.type === "commodity" && investment.title.includes("GOLD") && <Coins className="h-8 w-8 text-yellow-600" />}
+                        </div>
+
+                        {/* Investment Details */}
+                        <div className="text-center space-y-1">
+                          <div>
+                            <div className="text-xs text-slate-600">BALANCE</div>
+                            <div className="font-bold">${investment.balance.toLocaleString(undefined, { minimumFractionDigits: 2 })}</div>
+                          </div>
+                          {investment.shares !== undefined && (
+                            <div>
+                              <div className="text-xs text-slate-600">SHARES</div>
+                              <div className="font-bold">{investment.shares}</div>
+                            </div>
+                          )}
+                          <div>
+                            <div className="text-xs text-slate-600">PROFIT/LOSS</div>
+                            <div className={`font-bold ${investment.profit >= 0 ? "text-green-600" : "text-red-600"}`}>
+                              {investment.profit >= 0 ? "+" : "-"}${Math.abs(investment.profit).toLocaleString(undefined, { minimumFractionDigits: 2 })}
+                            </div>
+                          </div>
+                          {investment.price && (
+                            <div>
+                              <div className="text-xs text-slate-600">PRICE</div>
+                              <div className="text-xs">${investment.price.toFixed(2)}</div>
+                            </div>
+                          )}
+                        </div>
+
+                        {/* Action Buttons */}
+                        <div className="space-y-2">
+                          {getInvestmentActions(investment.type).map((action) => (
+                            <Button 
+                              key={action} 
+                              size="sm" 
+                              className="w-full bg-orange-600 hover:bg-orange-700 text-white"
+                              onClick={() => openInvestmentDialog(investment, action)}
+                            >
+                              {action}
+                            </Button>
+                          ))}
+                        </div>
+                      </CardContent>
+                    </Card>
+                  ))}
+                </div>
+              </div>
             </div>
-          </div>
-        </div>
+          </TabsContent>
+
+          <TabsContent value="achievements">
+            <div className="space-y-6">
+              <div className="text-center">
+                <h2 className="text-3xl font-bold mb-4">Investment Achievements</h2>
+                <p className="text-muted-foreground mb-8">
+                  Unlock achievements by reaching investment milestones and financial goals
+                </p>
+                <div className="flex justify-center gap-4 mb-8">
+                  <Badge variant="outline" className="text-lg p-2">
+                    {earnedAchievements.length} / {achievements.length} Unlocked
+                  </Badge>
+                  <Badge variant="secondary" className="text-lg p-2">
+                    {Math.round((earnedAchievements.length / achievements.length) * 100)}% Complete
+                  </Badge>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {achievements.map((achievement) => {
+                  const isEarned = earnedAchievements.includes(achievement.id);
+                  return (
+                    <Card 
+                      key={achievement.id} 
+                      className={`transition-all duration-300 ${
+                        isEarned 
+                          ? 'bg-gradient-to-br from-yellow-50 to-orange-50 border-yellow-300 shadow-lg' 
+                          : 'bg-muted/30 opacity-60'
+                      }`}
+                    >
+                      <CardContent className="p-6 text-center">
+                        <div className={`w-16 h-16 rounded-full mx-auto mb-4 flex items-center justify-center ${
+                          isEarned 
+                            ? 'bg-gradient-to-br from-yellow-400 to-orange-500' 
+                            : 'bg-muted'
+                        }`}>
+                          <achievement.icon className={`h-8 w-8 ${
+                            isEarned ? 'text-white' : 'text-muted-foreground'
+                          }`} />
+                        </div>
+                        <h3 className="font-bold text-lg mb-2">{achievement.title}</h3>
+                        <p className="text-sm text-muted-foreground mb-4">{achievement.description}</p>
+                        <Badge variant={isEarned ? "default" : "secondary"}>
+                          {isEarned ? "🏆 Earned" : "🔒 Locked"}
+                        </Badge>
+                      </CardContent>
+                    </Card>
+                  );
+                })}
+              </div>
+            </div>
+          </TabsContent>
+        </Tabs>
       </div>
 
       {/* Random Event Dialog */}

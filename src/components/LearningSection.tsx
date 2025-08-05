@@ -88,33 +88,6 @@ const LearningSection = () => {
     }
   ];
 
-  const financialGoals = [
-    { 
-      title: "Emergency Fund", 
-      target: 10000, 
-      current: 0, 
-      icon: Shield, 
-      color: "bg-red-500",
-      deadline: "6 months"
-    },
-    { 
-      title: "House Down Payment", 
-      target: 50000, 
-      current: 0, 
-      icon: Home, 
-      color: "bg-blue-500",
-      deadline: "2 years"
-    },
-    { 
-      title: "Education Fund", 
-      target: 25000, 
-      current: 0, 
-      icon: GraduationCap, 
-      color: "bg-purple-500",
-      deadline: "4 years"
-    }
-  ];
-
   const gameActivities = [
     {
       title: "Stack Your Future",
@@ -125,13 +98,6 @@ const LearningSection = () => {
       time: "20 years (simulated)",
       featured: true
     }
-  ];
-
-  const achievements = [
-    { title: "First Savings Goal", description: "Reached your first $100", icon: Trophy, earned: false },
-    { title: "Budget Master", description: "Stayed on budget for 30 days", icon: Target, earned: false },
-    { title: "Smart Spender", description: "Made 10 wise spending decisions", icon: Star, earned: false },
-    { title: "Investment Novice", description: "Completed first investment lesson", icon: TrendingUp, earned: false }
   ];
 
   return (
@@ -147,11 +113,9 @@ const LearningSection = () => {
         </div>
 
         <Tabs defaultValue="courses" className="w-full">
-          <TabsList className="grid w-full grid-cols-4 mb-8">
+          <TabsList className="grid w-full grid-cols-2 mb-8">
             <TabsTrigger value="courses">Learning Paths</TabsTrigger>
             <TabsTrigger value="games">Interactive Games</TabsTrigger>
-            <TabsTrigger value="goals">Goal Tracking</TabsTrigger>
-            <TabsTrigger value="achievements">Achievements</TabsTrigger>
           </TabsList>
 
           <TabsContent value="courses" className="space-y-8">
@@ -245,94 +209,6 @@ const LearningSection = () => {
                 </Card>
               ))}
             </div>
-          </TabsContent>
-
-          <TabsContent value="goals" className="space-y-8">
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {financialGoals.map((goal, index) => (
-                <Card key={index} className="hover:shadow-lg transition-all duration-300">
-                  <CardHeader>
-                    <div className="flex items-center gap-3 mb-2">
-                      <div className={`w-12 h-12 ${goal.color} rounded-lg flex items-center justify-center`}>
-                        <goal.icon className="h-6 w-6 text-white" />
-                      </div>
-                      <div className="flex-1">
-                        <CardTitle className="text-lg">{goal.title}</CardTitle>
-                        <p className="text-sm text-muted-foreground">Target: {goal.deadline}</p>
-                      </div>
-                    </div>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="space-y-4">
-                      <div>
-                        <div className="flex justify-between text-sm mb-2">
-                          <span>${goal.current.toLocaleString()}</span>
-                          <span>${goal.target.toLocaleString()}</span>
-                        </div>
-                        <Progress value={(goal.current / goal.target) * 100} className="h-3" />
-                        <p className="text-xs text-muted-foreground mt-1">
-                          {Math.round((goal.current / goal.target) * 100)}% complete
-                        </p>
-                      </div>
-                      
-                      <div className="flex gap-2">
-                        <Button size="sm" className="flex-1">Add Funds</Button>
-                        <Button size="sm" variant="outline" className="flex-1">Edit Goal</Button>
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
-              ))}
-            </div>
-
-            <Card className="bg-muted/50">
-              <CardHeader>
-                <CardTitle>Set New Financial Goal</CardTitle>
-                <CardDescription>
-                  Create a new savings or investment goal to track your progress
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <Button>
-                  <Target className="mr-2 h-4 w-4" />
-                  Create Goal
-                </Button>
-              </CardContent>
-            </Card>
-          </TabsContent>
-
-          <TabsContent value="achievements" className="space-y-8">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {achievements.map((achievement, index) => (
-                <Card key={index} className={`transition-all duration-300 ${achievement.earned ? 'bg-accent/50 border-primary' : 'opacity-60'}`}>
-                  <CardContent className="p-6">
-                    <div className="flex items-center gap-4">
-                      <div className={`w-16 h-16 rounded-full flex items-center justify-center ${achievement.earned ? 'bg-primary' : 'bg-muted'}`}>
-                        <achievement.icon className={`h-8 w-8 ${achievement.earned ? 'text-white' : 'text-muted-foreground'}`} />
-                      </div>
-                      <div className="flex-1">
-                        <h3 className="font-semibold text-lg">{achievement.title}</h3>
-                        <p className="text-muted-foreground">{achievement.description}</p>
-                        <Badge variant={achievement.earned ? "default" : "secondary"} className="mt-2">
-                          {achievement.earned ? "Earned" : "Locked"}
-                        </Badge>
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
-              ))}
-            </div>
-
-            <Card className="bg-gradient-subtle">
-              <CardContent className="p-8 text-center">
-                <Trophy className="h-16 w-16 mx-auto mb-4 text-primary" />
-                <h3 className="text-2xl font-bold mb-2">Keep Learning!</h3>
-                <p className="text-muted-foreground mb-4">
-                  Complete lessons and reach milestones to unlock more achievements
-                </p>
-                <Button>View All Achievements</Button>
-              </CardContent>
-            </Card>
           </TabsContent>
         </Tabs>
       </div>
