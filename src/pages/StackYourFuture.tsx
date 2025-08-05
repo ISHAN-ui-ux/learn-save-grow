@@ -155,6 +155,10 @@ const StackYourFuture = () => {
   const [paymentInvestments, setPaymentInvestments] = useState<Investment[]>([]);
   const [pendingPayment, setPendingPayment] = useState<{ amount: number; reason: string } | null>(null);
   const [showPortfolio, setShowPortfolio] = useState(false);
+  const [showInvestmentLesson, setShowInvestmentLesson] = useState(false);
+  const [currentLessonData, setCurrentLessonData] = useState<{title: string, content: string} | null>(null);
+  const [cdTimers, setCdTimers] = useState<{[key: string]: number}>({});
+  const [showGameStart, setShowGameStart] = useState(true);
   const { toast } = useToast();
 
   const achievements: Achievement[] = [
@@ -381,16 +385,192 @@ const StackYourFuture = () => {
     }
   }, [currentYear, netWorth]);
 
-  // Investment lessons data
-  const investmentLessons: { [key: string]: string } = {
-    "savings": "💡 Savings Account: Very low interest (around 2%) but your money is safe and FDIC insured up to $250k. Perfect for emergency funds and rainy days - you won't lose money here!",
-    "cd": "💡 Certificate of Deposit (CD): Higher interest than savings (around 3.5%) but your money is locked up for a set period. Early withdrawal means penalties. Safe and predictable returns.",
-    "index": "💡 Index Fund: Diversified investment tracking the entire market (around 8% average). Lower risk than individual stocks because you own a piece of many companies. Great for long-term growth!",
-    "strong-oil": "💡 Individual Stocks: Higher potential returns (10-15%) but much riskier. Stock prices fluctuate daily based on company performance and market sentiment. Can lose significant value quickly!",
-    "bonds": "💡 Government Bonds: Very safe investment backed by the government (around 2.5%). Lower returns but extremely stable. Good for preserving capital during volatile times.",
-    "wheat": "💡 Commodities: Physical goods like wheat, oil, gold (15-20% potential). Highly volatile and affected by weather, politics, and global events. High risk, high reward!",
-    "gold": "💡 Gold Investment: Precious metal that often holds value during economic uncertainty (around 20% potential). Volatile but historically a hedge against inflation and market crashes."
+  // Detailed investment lessons with pros and cons
+  const investmentLessons: { [key: string]: { title: string, content: string } } = {
+    "savings": {
+      title: "💰 Savings Account",
+      content: `A savings account is your safest option - think of it as your financial safety net!
+
+✅ PROS:
+• FDIC insured up to $250,000 - your money is 100% safe
+• Easy access to your money anytime (liquid)
+• Perfect for emergency funds and short-term goals
+• No risk of losing your principal
+• Builds good saving habits
+
+❌ CONS:
+• Very low interest rates (around 2% annually)
+• Money loses value to inflation over time
+• Won't help you build wealth long-term
+• Opportunity cost - missing higher returns elsewhere
+
+💡 BEST FOR: Emergency fund, short-term savings, money you need quick access to`
+    },
+    "cd": {
+      title: "📜 Certificate of Deposit (CD)",
+      content: `CDs are like making a deal with the bank - lock up your money for guaranteed returns!
+
+✅ PROS:
+• Higher interest than savings (around 3.5% annually)
+• FDIC insured - completely safe investment
+• Guaranteed return - you know exactly what you'll earn
+• Forces you to save (can't easily spend the money)
+• Good for specific future goals
+
+❌ CONS:
+• Money is locked up for set period (6 months to 5 years)
+• Early withdrawal penalties (lose interest + fees)
+• Interest rates are fixed - miss out if rates rise
+• Still loses to inflation long-term
+• No liquidity during the term
+
+⚠️ PENALTY WARNING: Withdraw early and you'll lose 3-6 months of interest plus fees!
+
+💡 BEST FOR: Money you won't need for specific time period, conservative savers`
+    },
+    "index": {
+      title: "📈 Index Fund",
+      content: `Index funds are like buying a slice of the entire stock market - diversification made easy!
+
+✅ PROS:
+• Instant diversification (own pieces of hundreds of companies)
+• Lower risk than individual stocks
+• Historical average of 8-10% annual returns
+• Low fees and management costs
+• Perfect for long-term wealth building
+• Don't need to pick individual stocks
+
+❌ CONS:
+• Market volatility - value goes up and down
+• Can lose money in bear markets
+• Returns aren't guaranteed
+• Need long-term commitment (5+ years)
+• No control over individual holdings
+
+💡 THE STRATEGY: Buy and hold for decades. Short-term losses happen, but historically the market always recovers and grows!
+
+💡 BEST FOR: Long-term investors, retirement savings, building wealth over time`
+    },
+    "strong-oil": {
+      title: "🎯 Individual Stocks",
+      content: `Buying individual stocks means owning pieces of specific companies - high risk, high reward!
+
+✅ PROS:
+• Highest potential returns (some stocks return 100%+ annually)
+• Ownership in companies you believe in
+• Potential for huge gains with right picks
+• Dividends from profitable companies
+• Complete control over your selections
+
+❌ CONS:
+• Extremely risky - companies can go bankrupt
+• Requires research and market knowledge
+• Emotional roller coaster - prices swing wildly
+• Can lose 50-90% of value quickly
+• Time-consuming to research and monitor
+• Single company risk (no diversification)
+
+⚠️ WARNING: Most individual stock pickers lose money. Even professionals struggle to beat the market!
+
+💡 BEST FOR: Experienced investors, money you can afford to lose, small portion of portfolio`
+    },
+    "bonds": {
+      title: "🏛️ Government Bonds",
+      content: `Government bonds are loans to the government - ultra-safe but modest returns!
+
+✅ PROS:
+• Backed by full faith of US government (safest investment)
+• Steady, predictable income
+• Lower volatility than stocks
+• Good for portfolio balance during market crashes
+• Various terms available (1-30 years)
+
+❌ CONS:
+• Very low returns (around 2.5% annually)
+• Loses purchasing power to inflation
+• Interest rate risk (value drops when rates rise)
+• Opportunity cost versus stocks long-term
+• Boring and slow growth
+
+💡 THE ROLE: Think of bonds as the "boring but reliable" part of your portfolio
+
+💡 BEST FOR: Conservative investors, portfolio diversification, nearing retirement`
+    },
+    "wheat": {
+      title: "🌾 Commodity Trading (Wheat)",
+      content: `Commodities are physical goods - wheat, oil, metals. Extremely volatile but potential for big gains!
+
+✅ PROS:
+• Inflation hedge (prices rise with inflation)
+• High potential returns during supply shortages
+• Diversification from stocks and bonds
+• Global demand for food keeps wheat relevant
+• Can profit from weather/crop disasters
+
+❌ CONS:
+• Extremely volatile - prices swing wildly
+• Affected by weather, politics, global events
+• No dividends or interest payments
+• Requires deep market knowledge
+• Can lose money fast during oversupply
+• Storage and transportation complexities
+
+⚠️ HIGH RISK: Weather disasters can 10x prices overnight, or bumper crops can crash them!
+
+💡 BEST FOR: Experienced traders, small portion of portfolio, inflation protection`
+    },
+    "gold": {
+      title: "✨ Gold Investment",
+      content: `Gold has been valuable for thousands of years - the ultimate hedge against uncertainty!
+
+✅ PROS:
+• Historic store of value (5000+ years)
+• Hedge against inflation and market crashes
+• Safe haven during economic uncertainty
+• Portfolio diversification
+• Globally recognized and liquid
+• No company/government default risk
+
+❌ CONS:
+• Produces no income (no dividends/interest)
+• Extremely volatile short-term
+• Storage and insurance costs
+• Can underperform stocks for decades
+• Price driven by emotion and speculation
+• Mining/environmental concerns
+
+💡 THE TRUTH: Gold shines during crises but can be boring during good times
+
+💡 BEST FOR: Portfolio insurance, uncertain economic times, 5-10% of total portfolio max`
+    }
   };
+
+  // Game start tutorial
+  useEffect(() => {
+    if (showGameStart) {
+      const savingsLesson = investmentLessons["savings"];
+      setCurrentLessonData(savingsLesson);
+      setShowInvestmentLesson(true);
+      setShowGameStart(false);
+    }
+  }, [showGameStart]);
+
+  // CD Timer countdown
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setCdTimers(prev => {
+        const updated = { ...prev };
+        Object.keys(updated).forEach(key => {
+          if (updated[key] > 0) {
+            updated[key] -= 1;
+          }
+        });
+        return updated;
+      });
+    }, 1000);
+
+    return () => clearInterval(timer);
+  }, []);
 
   // Check for unlocking new investments
   useEffect(() => {
@@ -408,12 +588,15 @@ const StackYourFuture = () => {
           inv.id === id ? { ...inv, unlocked: true } : inv
         ));
         
-        // Show lesson when unlocking
+        // Show detailed lesson when unlocking
         const lesson = investmentLessons[id];
+        setCurrentLessonData(lesson);
+        setShowInvestmentLesson(true);
+        
         toast({
           title: "🔓 New Investment Unlocked!",
-          description: `${name} is now available! ${lesson}`,
-          duration: 8000
+          description: `${name} is now available! Click to learn more.`,
+          duration: 5000
         });
       }
     });
@@ -656,6 +839,15 @@ const StackYourFuture = () => {
                 }
               : inv
           ));
+          
+          // Start CD timer if buying CD
+          if (selectedInvestment.type === "cd") {
+            setCdTimers(prev => ({
+              ...prev,
+              [selectedInvestment.id]: 120 // 2 minutes in seconds
+            }));
+          }
+          
           toast({ title: "Investment Made", description: `Invested $${amount} in ${selectedInvestment.title}` });
         } else {
           toast({ title: "Insufficient Funds", description: "Not enough cash available!" });
@@ -665,7 +857,22 @@ const StackYourFuture = () => {
       case "WITHDRAW":
       case "SELL":
         if (selectedInvestment.balance >= amount) {
-          setPocketCash(prev => prev + amount);
+          let finalAmount = amount;
+          
+          // Apply CD early withdrawal penalty
+          if (selectedInvestment.type === "cd" && cdTimers[selectedInvestment.id] > 0) {
+            const penalty = amount * 0.15; // 15% penalty
+            finalAmount = amount - penalty;
+            toast({ 
+              title: "⚠️ Early Withdrawal Penalty", 
+              description: `Withdrew $${finalAmount.toFixed(2)} after $${penalty.toFixed(2)} penalty fee!`,
+              duration: 6000
+            });
+          } else {
+            toast({ title: "Withdrawal Made", description: `Withdrew $${amount} from ${selectedInvestment.title}` });
+          }
+          
+          setPocketCash(prev => prev + finalAmount);
           setInvestments(prev => prev.map(inv => 
             inv.id === selectedInvestment.id 
               ? { 
@@ -676,7 +883,6 @@ const StackYourFuture = () => {
               : inv
           ));
           setSellCount(prev => prev + 1);
-          toast({ title: "Withdrawal Made", description: `Withdrew $${amount} from ${selectedInvestment.title}` });
         } else {
           toast({ title: "Insufficient Balance", description: "Not enough invested in this option!" });
           return;
@@ -876,8 +1082,30 @@ const StackYourFuture = () => {
                           )}
                         </div>
 
+                        {/* CD Timer */}
+                        {investment.type === "cd" && cdTimers[investment.id] > 0 && (
+                          <div className="text-center p-2 bg-yellow-600/20 rounded">
+                            <div className="text-xs text-yellow-300">🔒 CD LOCKED</div>
+                            <div className="text-sm font-bold text-yellow-400">
+                              {Math.floor(cdTimers[investment.id] / 60)}:{(cdTimers[investment.id] % 60).toString().padStart(2, '0')}
+                            </div>
+                            <div className="text-xs text-yellow-300">Early withdrawal = 15% penalty</div>
+                          </div>
+                        )}
+
                         {/* Action Buttons */}
                         <div className="space-y-2">
+                          <Button 
+                            size="sm" 
+                            variant="outline"
+                            className="w-full border-blue-400 text-blue-400 hover:bg-blue-400 hover:text-white"
+                            onClick={() => {
+                              setCurrentLessonData(investmentLessons[investment.id] || investmentLessons[investment.type]);
+                              setShowInvestmentLesson(true);
+                            }}
+                          >
+                            💡 Learn About This
+                          </Button>
                           {getInvestmentActions(investment.type).map((action) => (
                             <Button 
                               key={action} 
@@ -1210,6 +1438,30 @@ const StackYourFuture = () => {
               </div>
             )}
           </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Investment Lesson Dialog */}
+      <Dialog open={showInvestmentLesson} onOpenChange={setShowInvestmentLesson}>
+        <DialogContent className="bg-slate-900 border-blue-500 text-white max-w-2xl max-h-[80vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle className="text-blue-400 text-2xl mb-4">
+              {currentLessonData?.title}
+            </DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4">
+            <div className="text-slate-200 whitespace-pre-line text-base leading-relaxed">
+              {currentLessonData?.content}
+            </div>
+          </div>
+          <DialogFooter>
+            <Button 
+              onClick={() => setShowInvestmentLesson(false)}
+              className="bg-blue-600 hover:bg-blue-700 text-white"
+            >
+              Got it! 👍
+            </Button>
+          </DialogFooter>
         </DialogContent>
       </Dialog>
     </div>
