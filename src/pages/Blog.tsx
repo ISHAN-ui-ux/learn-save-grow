@@ -8,151 +8,145 @@ import Navigation from "@/components/Navigation";
 import Footer from "@/components/Footer";
 
 const Blog = () => {
-  const [visibleArticles, setVisibleArticles] = useState(6);
   
   const allArticles = [
     {
       id: 1,
-      title: "10 Simple Ways Kids Can Start Saving Money Today",
-      excerpt: "Discover easy and fun methods for children to begin their savings journey with practical tips that work.",
+      title: "What is the Stock Market? A Kid's Guide to Understanding Stocks",
+      excerpt: "Learn the basics of the stock market in simple terms that kids can understand, from what stocks are to how companies raise money.",
       author: "Ishan Nallani",
       date: "March 15, 2024",
       readTime: "5 min read",
-      category: "Kids Finance",
+      category: "Stock Market Basics",
       trending: true,
-      image: "https://images.unsplash.com/photo-1579621970563-ebec7560ff3e?w=400&h=250&fit=crop"
+      image: "https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?w=400&h=250&fit=crop"
     },
     {
       id: 2,
-      title: "The Psychology of Money: Teaching Kids About Spending Habits",
-      excerpt: "Understanding the mental aspects of money management and how to instill healthy financial behaviors early.",
+      title: "Famous Young Investors: Kids Who Started Early",
+      excerpt: "Inspiring stories of young people who began investing as children and what we can learn from their journeys.",
       author: "Arvind Vivekanandan",
       date: "March 12, 2024",
       readTime: "8 min read",
-      category: "Psychology",
+      category: "Inspiration",
       trending: true,
       image: "https://images.unsplash.com/photo-1554224155-6726b3ff858f?w=400&h=250&fit=crop"
     },
     {
       id: 3,
-      title: "Cryptocurrency for Beginners: A Parent's Guide",
-      excerpt: "Everything parents need to know about digital currencies and how to discuss them with their children.",
+      title: "How to Read Stock Charts: A Visual Guide for Kids",
+      excerpt: "Simple explanations of stock charts, graphs, and what all those lines and numbers mean in kid-friendly language.",
       author: "Marcus Chen",
       date: "March 10, 2024",
       readTime: "12 min read",
-      category: "Technology",
+      category: "Chart Reading",
       trending: true,
       image: "https://images.unsplash.com/photo-1640340434855-6084b1f4901c?w=400&h=250&fit=crop"
     },
     {
       id: 4,
-      title: "Building Credit: A Teen's Complete Guide",
-      excerpt: "Step-by-step instructions for teenagers to start building a positive credit history responsibly.",
+      title: "Bull vs Bear Markets: Animal Lessons for Young Investors",
+      excerpt: "Understanding market cycles through fun animal analogies that help kids remember important investing concepts.",
       author: "Jennifer Smith",
       date: "March 8, 2024",
       readTime: "10 min read",
-      category: "Credit",
+      category: "Market Concepts",
       trending: false,
       image: "https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?w=400&h=250&fit=crop"
     },
     {
       id: 5,
-      title: "The Gig Economy: Teaching Teens About Modern Work",
-      excerpt: "How to prepare teenagers for the changing landscape of work and entrepreneurship opportunities.",
+      title: "Dividend Stocks: How Companies Share Their Profits with Kids",
+      excerpt: "Learn about dividend stocks and how some companies pay investors regular money, just like allowance for owning their stock.",
       author: "Priya Sharma",
       date: "March 5, 2024",
       readTime: "7 min read",
-      category: "Career",
+      category: "Dividends",
       trending: false,
       image: "https://images.unsplash.com/photo-1552664730-d307ca884978?w=400&h=250&fit=crop"
     },
     {
       id: 6,
-      title: "Emergency Funds for Families: Getting Started",
-      excerpt: "Creating a financial safety net for your family and teaching kids about financial preparedness.",
+      title: "Stock Market Vocabulary: Essential Terms Every Kid Should Know",
+      excerpt: "Build your stock market vocabulary with fun definitions of important terms like IPO, portfolio, and market cap.",
       author: "Lisa Wang",
       date: "March 3, 2024",
       readTime: "6 min read",
-      category: "Emergency Planning",
+      category: "Vocabulary",
       trending: false,
       image: "https://images.unsplash.com/photo-1607863680198-23d4b2565df0?w=400&h=250&fit=crop"
     },
     {
       id: 7,
-      title: "Investment Basics: Teaching Kids About the Stock Market",
-      excerpt: "Age-appropriate ways to introduce children to investing concepts and market fundamentals.",
+      title: "Tech Stocks vs Traditional Stocks: What's the Difference?",
+      excerpt: "Compare technology companies with traditional businesses and learn why some stocks grow faster than others.",
       author: "Ishan Nallani",
       date: "March 1, 2024",
       readTime: "9 min read",
-      category: "Investing",
+      category: "Stock Types",
       trending: false,
-      image: "https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?w=400&h=250&fit=crop"
+      image: "https://images.unsplash.com/photo-1518186285589-2f7649de83e0?w=400&h=250&fit=crop"
     },
     {
       id: 8,
-      title: "Financial Planning for Single Parents",
-      excerpt: "Strategies for managing finances and teaching money skills as a single parent household.",
+      title: "Stock Market Games: Practice Investing Without Real Money",
+      excerpt: "Discover fun online games and simulations where kids can practice investing with virtual money before using real cash.",
       author: "Arvind Vivekanandan",
       date: "February 28, 2024",
       readTime: "11 min read",
-      category: "Family Finance",
+      category: "Practice Tools",
       trending: false,
       image: "https://images.unsplash.com/photo-1544027993-37dbfe43562a?w=400&h=250&fit=crop"
     },
     {
       id: 9,
-      title: "Teaching Teenagers About Taxes and Income",
-      excerpt: "Help your teen understand tax basics, filing requirements, and income management.",
+      title: "Why Do Stock Prices Go Up and Down? Market Forces Explained",
+      excerpt: "Simple explanations of supply and demand, news events, and other factors that make stock prices change every day.",
       author: "Robert Johnson",
       date: "February 25, 2024",
       readTime: "8 min read",
-      category: "Taxes",
+      category: "Market Forces",
       trending: false,
       image: "https://images.unsplash.com/photo-1554224154-26032fbc4d72?w=400&h=250&fit=crop"
     },
     {
       id: 10,
-      title: "Digital Banking Safety for Kids and Teens",
-      excerpt: "Essential cybersecurity practices for young people using online banking and financial apps.",
+      title: "Building Your First Portfolio: A Step-by-Step Guide for Kids",
+      excerpt: "Learn how to create a balanced portfolio with different types of stocks and investments that grow over time.",
       author: "Sarah Mitchell",
       date: "February 22, 2024",
       readTime: "6 min read",
-      category: "Digital Safety",
+      category: "Portfolio Building",
       trending: false,
       image: "https://images.unsplash.com/photo-1563013544-824ae1b704d3?w=400&h=250&fit=crop"
     },
     {
       id: 11,
-      title: "College Savings Plans: 529 vs Other Options",
-      excerpt: "Compare different college savings strategies and help your child understand education funding.",
+      title: "Stock Market History: Famous Crashes and Booms Kids Should Know",
+      excerpt: "Learn about important events in stock market history and what they teach us about investing for the long term.",
       author: "Michael Davis",
       date: "February 20, 2024",
       readTime: "10 min read",
-      category: "Education Finance",
+      category: "Market History",
       trending: false,
       image: "https://images.unsplash.com/photo-1523050854058-8df90110c9f1?w=400&h=250&fit=crop"
     },
     {
       id: 12,
-      title: "Teaching Kids About Global Economics",
-      excerpt: "Help children understand how world events affect personal finances and local economies.",
+      title: "How to Research Stocks Like a Pro: Kid-Friendly Analysis Tips",
+      excerpt: "Simple methods for researching companies and stocks that even young investors can use to make smart decisions.",
       author: "Dr. Elena Rodriguez",
       date: "February 18, 2024",
       readTime: "7 min read",
-      category: "Economics",
+      category: "Research Methods",
       trending: false,
       image: "https://images.unsplash.com/photo-1611224923853-80b023f02d71?w=400&h=250&fit=crop"
     }
   ];
 
   const trendingArticles = allArticles.filter(article => article.trending);
-  const displayedArticles = allArticles.slice(0, visibleArticles);
 
-  const loadMoreArticles = () => {
-    setVisibleArticles(prev => Math.min(prev + 6, allArticles.length));
-  };
-
-  const categories = ["All", "Kids Finance", "Psychology", "Technology", "Credit", "Career", "Emergency Planning", "Investing", "Family Finance", "Taxes", "Digital Safety", "Education Finance", "Economics"];
+  const categories = ["All", "Stock Market Basics", "Inspiration", "Chart Reading", "Market Concepts", "Dividends", "Vocabulary", "Stock Types", "Practice Tools", "Market Forces", "Portfolio Building", "Market History", "Research Methods"];
 
   return (
     <div className="min-h-screen bg-background">
@@ -163,10 +157,10 @@ const Blog = () => {
         <div className="container mx-auto px-4">
           <div className="text-center mb-12">
             <h1 className="text-4xl md:text-6xl font-bold text-foreground mb-6">
-              Finance Learning Hub
+              Stock Market Learning Hub
             </h1>
             <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-              Stay updated with the latest trends, tips, and insights in financial education for families
+              Learn about the stock market, investing, and building wealth through kid-friendly articles and guides
             </p>
           </div>
         </div>
@@ -236,7 +230,7 @@ const Blog = () => {
               <h2 className="text-3xl font-bold text-foreground mb-8">All Articles</h2>
 
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {displayedArticles.map((article) => (
+            {allArticles.map((article) => (
               <Link key={article.id} to={`/blog/${article.id}`}>
                 <Card className="group hover:shadow-lg transition-shadow cursor-pointer h-full">
                   <div className="relative">
@@ -284,14 +278,6 @@ const Blog = () => {
               </Link>
             ))}
           </div>
-
-          {visibleArticles < allArticles.length && (
-            <div className="text-center mt-12">
-              <Button size="lg" className="bg-primary hover:bg-primary/90" onClick={loadMoreArticles}>
-                Load More Articles
-              </Button>
-            </div>
-          )}
         </div>
       </section>
 
