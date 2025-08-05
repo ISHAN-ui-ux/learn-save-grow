@@ -117,7 +117,7 @@ const LearningSection = () => {
 
   const gameActivities = [
     {
-      title: "Build Your Stax",
+      title: "Stack Your Future",
       description: "An investment simulation game designed to teach financial literacy and investment strategies. Manage a portfolio over 20 simulated years, making decisions about savings accounts, CDs, index funds, individual stocks, and more. Learn about dollar-cost averaging, risk management, and long-term investment consequences using real market data.",
       icon: TrendingUp,
       players: "Solo",
@@ -235,7 +235,7 @@ const LearningSection = () => {
                         </div>
                       </div>
                       <Button className="w-full" variant={game.featured ? "default" : "outline"} asChild>
-                        <Link to="/build-your-stax">
+                        <Link to="/stack-your-future">
                           <Play className="mr-2 h-4 w-4" />
                           Play Now
                         </Link>
