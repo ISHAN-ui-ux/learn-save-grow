@@ -116,31 +116,13 @@ const LearningSection = () => {
 
   const gameActivities = [
     {
-      title: "Budget Battle",
-      description: "Balance your spending in this fun budget game",
-      icon: Gamepad2,
-      players: "1-4",
-      difficulty: "Easy",
-      time: "15 min",
-      featured: true
-    },
-    {
-      title: "Savings Challenge",
-      description: "Complete daily savings tasks and earn rewards",
-      icon: PiggyBank,
-      players: "Solo",
-      difficulty: "Medium", 
-      time: "Daily",
-      featured: false
-    },
-    {
-      title: "Investment Simulator",
-      description: "Practice investing with virtual money",
+      title: "Build Your Stax",
+      description: "An investment simulation game designed to teach financial literacy and investment strategies. Manage a portfolio over 20 simulated years, making decisions about savings accounts, CDs, index funds, individual stocks, and more. Learn about dollar-cost averaging, risk management, and long-term investment consequences using real market data.",
       icon: TrendingUp,
       players: "Solo",
-      difficulty: "Hard",
-      time: "30 min",
-      featured: false
+      difficulty: "Medium",
+      time: "20 years (simulated)",
+      featured: true
     }
   ];
 
