@@ -3,6 +3,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Link } from "react-router-dom";
 import { 
   Gamepad2, 
   Gift, 
@@ -233,9 +234,11 @@ const LearningSection = () => {
                           <p className="text-muted-foreground">{game.time}</p>
                         </div>
                       </div>
-                      <Button className="w-full" variant={game.featured ? "default" : "outline"}>
-                        <Play className="mr-2 h-4 w-4" />
-                        Play Now
+                      <Button className="w-full" variant={game.featured ? "default" : "outline"} asChild>
+                        <Link to="/build-your-stax">
+                          <Play className="mr-2 h-4 w-4" />
+                          Play Now
+                        </Link>
                       </Button>
                     </div>
                   </CardContent>
