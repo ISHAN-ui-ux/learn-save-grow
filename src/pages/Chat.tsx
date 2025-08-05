@@ -142,40 +142,15 @@ const Chat = () => {
         </div>
       </div>
 
-      <div className="flex">
-        {/* Sidebar */}
-        <div className="w-16 bg-white border-r border-green-200 flex flex-col items-center py-4 space-y-6">
-          <div className="w-8 h-8 bg-gradient-to-br from-green-500 to-emerald-600 rounded-lg flex items-center justify-center">
-            <Sparkles className="h-4 w-4 text-white" />
-          </div>
-          
-          <Separator className="w-8" />
-          
-          <div className="space-y-4">
-            <Button variant="ghost" size="icon" className="w-10 h-10 rounded-lg">
-              <Home className="h-5 w-5 text-gray-600" />
-            </Button>
-            <Button variant="ghost" size="icon" className="w-10 h-10 rounded-lg bg-green-50">
-              <MessageCircle className="h-5 w-5 text-green-600" />
-            </Button>
-            <Button variant="ghost" size="icon" className="w-10 h-10 rounded-lg">
-              <Globe className="h-5 w-5 text-gray-600" />
-            </Button>
-            <Button variant="ghost" size="icon" className="w-10 h-10 rounded-lg">
-              <FolderOpen className="h-5 w-5 text-gray-600" />
-            </Button>
-          </div>
+      {/* Main Content */}
+      <div className="flex-1 flex flex-col">
+        {/* Header */}
+        <div className="h-14 bg-white border-b border-green-200 flex items-center justify-center">
+          <h1 className="text-xl font-semibold text-green-800">Finance Assistant</h1>
         </div>
 
-        {/* Main Content */}
-        <div className="flex-1 flex flex-col">
-          {/* Header */}
-          <div className="h-14 bg-white border-b border-green-200 flex items-center justify-center">
-            <h1 className="text-xl font-semibold text-green-800">Finance Assistant</h1>
-          </div>
-
-          {/* Chat Area */}
-          <div className="flex-1 flex flex-col max-w-4xl mx-auto w-full">
+        {/* Chat Area */}
+        <div className="flex-1 flex flex-col max-w-4xl mx-auto w-full">
             {messages.length === 1 ? (
               // Welcome Screen
               <div className="flex-1 flex flex-col items-center justify-center p-8 text-center">
@@ -319,11 +294,10 @@ const Chat = () => {
                     </div>
                   </div>
                 )}
-              </div>
-            </div>
           </div>
         </div>
       </div>
+    </div>
     </div>
   );
 };
