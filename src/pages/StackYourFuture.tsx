@@ -141,12 +141,15 @@ const StackYourFuture = () => {
   const [selectedInvestment, setSelectedInvestment] = useState<Investment | null>(null);
   const [investmentAmount, setInvestmentAmount] = useState("");
   const [actionType, setActionType] = useState("");
-  const [timeRemaining, setTimeRemaining] = useState(120); // 2 minutes in seconds
+  const [timeRemaining, setTimeRemaining] = useState(60); // 1 minute in seconds
   const [eventsHandled, setEventsHandled] = useState(0);
   const [sellCount, setSellCount] = useState(0);
   const [gameWon, setGameWon] = useState(false);
   const [gameLost, setGameLost] = useState(false);
   const [showAchievementDialog, setShowAchievementDialog] = useState(false);
+  const [showPaymentOptions, setShowPaymentOptions] = useState(false);
+  const [paymentInvestments, setPaymentInvestments] = useState<Investment[]>([]);
+  const [pendingPayment, setPendingPayment] = useState<{ amount: number; reason: string } | null>(null);
   const { toast } = useToast();
 
   const achievements: Achievement[] = [
@@ -196,7 +199,7 @@ const StackYourFuture = () => {
       description: "The ultimate achievement - $1 billion net worth",
       icon: Crown,
       earned: false,
-      condition: (state) => state.netWorth >= 1000000000
+      condition: (state) => state.netWorth >= 1000000
     },
     {
       id: "diversified-portfolio",
@@ -327,7 +330,7 @@ const StackYourFuture = () => {
       setTimeRemaining(prev => {
         if (prev <= 1) {
           advanceTime();
-          return 120; // Reset to 2 minutes
+          return 60; // Reset to 1 minute
         }
         return prev - 1;
       });
@@ -339,7 +342,7 @@ const StackYourFuture = () => {
   // Check win/lose conditions
   useEffect(() => {
     if (currentYear >= 20 && !gameWon && !gameLost) {
-      if (netWorth >= 15000000) {
+      if (netWorth >= 1000000) {
         setGameWon(true);
         toast({
           title: "🎉 YOU WON!",
@@ -349,7 +352,7 @@ const StackYourFuture = () => {
         setGameLost(true);
         toast({
           title: "💸 Game Over",
-          description: `You ended with $${netWorth.toLocaleString()}. You needed $15 million to win.`,
+          description: `You ended with $${netWorth.toLocaleString()}. You needed $1 million to win.`,
         });
       }
     }
@@ -407,7 +410,7 @@ const StackYourFuture = () => {
         description: `Welcome to Year ${currentYear + 1}! You received $1,000.`
       });
     }
-    setTimeRemaining(120); // Reset timer
+    setTimeRemaining(60); // Reset timer
   };
 
   const updateStockPrices = () => {
@@ -426,23 +429,39 @@ const StackYourFuture = () => {
     setInvestments(prev => prev.map(inv => {
       let profitChange = 0;
       
+      // Random growth and income generation
+      const isGrowthPeriod = Math.random() > 0.3; // 70% chance of growth
+      
       switch (inv.type) {
         case "savings":
         case "cd":
         case "bonds":
-          profitChange = inv.balance * (inv.interestRate || 0.02) * 0.5;
+          if (isGrowthPeriod) {
+            profitChange = inv.balance * (inv.interestRate || 0.02) * (0.5 + Math.random() * 0.5);
+          } else {
+            profitChange = inv.balance * (inv.interestRate || 0.02) * -0.2; // Sometimes lose income
+          }
           break;
         case "index":
-          profitChange = inv.balance * (Math.random() * 0.2 - 0.05);
+          if (isGrowthPeriod) {
+            profitChange = inv.balance * (Math.random() * 0.15 + 0.05); // 5-20% growth
+          } else {
+            profitChange = inv.balance * (Math.random() * -0.1 - 0.05); // 5-15% loss
+          }
           break;
         case "stock":
-          const priceChange = (inv.price || 50) - 50; // Compare to initial price
-          const trend = priceChange > 0 ? "up" : "down";
-          const volatility = trend === "up" ? 0.15 : -0.15;
-          profitChange = inv.balance * (Math.random() * 0.3 - 0.15 + volatility);
+          if (isGrowthPeriod) {
+            profitChange = inv.balance * (Math.random() * 0.25 + 0.05); // 5-30% growth
+          } else {
+            profitChange = inv.balance * (Math.random() * -0.2 - 0.05); // 5-25% loss
+          }
           break;
         case "commodity":
-          profitChange = inv.balance * (Math.random() * 0.3 - 0.15);
+          if (isGrowthPeriod) {
+            profitChange = inv.balance * (Math.random() * 0.2 + 0.03); // 3-23% growth
+          } else {
+            profitChange = inv.balance * (Math.random() * -0.15 - 0.03); // 3-18% loss
+          }
           break;
       }
       
@@ -467,28 +486,47 @@ const StackYourFuture = () => {
           }
           break;
         case "Sell Investments":
-          const totalInvestmentValue = investments.reduce((sum, inv) => sum + inv.balance, 0);
-          if (totalInvestmentValue >= amount) {
-            // Sell from largest investment first
-            let remaining = amount;
-            setInvestments(prev => prev.map(inv => {
-              if (remaining > 0 && inv.balance > 0) {
-                const sellAmount = Math.min(remaining, inv.balance);
-                remaining -= sellAmount;
-                setSellCount(count => count + 1);
-                return { ...inv, balance: inv.balance - sellAmount };
-              }
-              return inv;
-            }));
-            setPocketCash(prev => prev + amount);
-            toast({ title: "💰 Investments Sold", description: `Sold $${amount} in investments to pay.` });
+          const investmentsWithBalance = investments.filter(inv => inv.balance > 0);
+          if (investmentsWithBalance.length > 0) {
+            setPaymentInvestments(investmentsWithBalance);
+            setPendingPayment({ amount, reason: currentEvent.title });
+            setShowPaymentOptions(true);
+            return;
           } else {
-            toast({ title: "💸 Not Enough Investments", description: "Can't cover the cost!" });
+            toast({ title: "💸 No Investments", description: "You have no investments to sell!" });
+            return;
+          }
+          break;
+        case "Take Legal Action":
+          const lawyerCost = 500;
+          if (pocketCash >= lawyerCost) {
+            setPocketCash(prev => prev - lawyerCost);
+            const winChance = Math.random() > 0.5;
+            if (winChance) {
+              setPocketCash(prev => prev + amount);
+              toast({ title: "⚖️ Legal Victory!", description: `Won the case! Recovered $${amount} (minus $${lawyerCost} lawyer fees)` });
+            } else {
+              toast({ title: "⚖️ Legal Defeat", description: `Lost the case. Paid $${lawyerCost} in lawyer fees and still owe $${amount}` });
+              setPocketCash(prev => prev - amount);
+            }
+          } else {
+            toast({ title: "💔 Can't Afford Lawyer", description: "Need $500 for legal fees!" });
             return;
           }
           break;
         default:
-          toast({ title: "⚠️ Risky Choice", description: "This will have consequences!" });
+          // Handle other risky choices with random consequences
+          const consequence = Math.random();
+          if (consequence < 0.3) {
+            toast({ title: "😅 Lucky Break!", description: "Somehow avoided the worst outcome!" });
+          } else if (consequence < 0.7) {
+            const penalty = amount * 0.5;
+            setPocketCash(prev => prev - penalty);
+            toast({ title: "⚠️ Partial Consequence", description: `Only had to pay $${penalty}` });
+          } else {
+            setPocketCash(prev => prev - amount);
+            toast({ title: "💸 Full Consequence", description: "Had to pay the full amount anyway!" });
+          }
       }
     } else {
       switch (choice) {
@@ -519,6 +557,34 @@ const StackYourFuture = () => {
     setEventsHandled(prev => prev + 1);
     setShowRandomEvent(false);
     setCurrentEvent(null);
+  };
+
+  const handleInvestmentPayment = (selectedInvestmentId: string) => {
+    if (!pendingPayment) return;
+    
+    const selectedInv = investments.find(inv => inv.id === selectedInvestmentId);
+    if (!selectedInv || selectedInv.balance < pendingPayment.amount) {
+      toast({ title: "💔 Insufficient Balance", description: "Not enough in this investment!" });
+      return;
+    }
+    
+    setInvestments(prev => prev.map(inv => 
+      inv.id === selectedInvestmentId 
+        ? { ...inv, balance: inv.balance - pendingPayment.amount }
+        : inv
+    ));
+    
+    setSellCount(prev => prev + 1);
+    toast({ 
+      title: "💰 Payment Made", 
+      description: `Sold $${pendingPayment.amount} from ${selectedInv.title}` 
+    });
+    
+    setShowPaymentOptions(false);
+    setPendingPayment(null);
+    setShowRandomEvent(false);
+    setCurrentEvent(null);
+    setEventsHandled(prev => prev + 1);
   };
 
   const openInvestmentDialog = (investment: Investment, action: string) => {
@@ -624,10 +690,10 @@ const StackYourFuture = () => {
                   <CardContent className="p-4 text-center">
                     <Target className="h-16 w-16 mx-auto mb-2 text-green-400" />
                     <div className="bg-black/30 rounded-lg p-2 text-sm text-white">
-                      {gameWon ? "🎉 YOU WON!" : gameLost ? "💸 Game Over" : `Goal: $15M by Year 20`}
+                      {gameWon ? "🎉 YOU WON!" : gameLost ? "💸 Game Over" : `Goal: $1M by Year 20`}
                     </div>
                     <div className="text-xs mt-1 text-green-300">
-                      Progress: {((netWorth / 15000000) * 100).toFixed(1)}%
+                      Progress: {((netWorth / 1000000) * 100).toFixed(1)}%
                     </div>
                   </CardContent>
                 </Card>
@@ -749,6 +815,9 @@ const StackYourFuture = () => {
                             <div className={`font-bold ${investment.profit >= 0 ? "text-green-400" : "text-red-400"}`}>
                               {investment.profit >= 0 ? "+" : "-"}${Math.abs(investment.profit).toLocaleString(undefined, { minimumFractionDigits: 2 })}
                             </div>
+                            <div className={`text-xs font-semibold ${investment.profit >= 0 ? "text-green-300" : "text-red-300"}`}>
+                              {investment.profit >= 0 ? "📈 GAINING" : "📉 LOSING"}
+                            </div>
                           </div>
                           {investment.price && (
                             <div>
@@ -865,6 +934,60 @@ const StackYourFuture = () => {
               </Button>
             ))}
           </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Investment Payment Selection Dialog */}
+      <Dialog open={showPaymentOptions} onOpenChange={setShowPaymentOptions}>
+        <DialogContent className="bg-slate-900 border-yellow-600 text-white">
+          <DialogHeader>
+            <DialogTitle className="text-yellow-400 text-xl">
+              💰 Choose Investment to Sell
+            </DialogTitle>
+            <DialogDescription className="text-slate-300">
+              You need ${pendingPayment?.amount} for: {pendingPayment?.reason}
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-2 max-h-96 overflow-y-auto">
+            {paymentInvestments.map((investment) => (
+              <Button 
+                key={investment.id}
+                variant="outline" 
+                className={`w-full bg-slate-800 border-slate-600 text-white hover:bg-slate-700 py-4 text-left ${
+                  investment.balance < (pendingPayment?.amount || 0) ? 'opacity-50 cursor-not-allowed' : ''
+                }`}
+                onClick={() => handleInvestmentPayment(investment.id)}
+                disabled={investment.balance < (pendingPayment?.amount || 0)}
+              >
+                <div className="flex justify-between w-full">
+                  <div>
+                    <div className="font-bold">{investment.title}</div>
+                    <div className="text-sm text-slate-400">
+                      Balance: ${investment.balance.toLocaleString()}
+                    </div>
+                  </div>
+                  <div className="text-right">
+                    {investment.balance >= (pendingPayment?.amount || 0) ? (
+                      <span className="text-green-400">✓ Available</span>
+                    ) : (
+                      <span className="text-red-400">✗ Insufficient</span>
+                    )}
+                  </div>
+                </div>
+              </Button>
+            ))}
+          </div>
+          <DialogFooter>
+            <Button 
+              variant="ghost" 
+              onClick={() => {
+                setShowPaymentOptions(false);
+                setPendingPayment(null);
+              }}
+            >
+              Cancel
+            </Button>
+          </DialogFooter>
         </DialogContent>
       </Dialog>
 
