@@ -155,9 +155,11 @@ const LearningSection = () => {
                         </ul>
                       </div>
 
-                      <Button className="w-full group-hover:bg-primary group-hover:text-primary-foreground">
-                        Start Learning
-                        <ChevronRight className="ml-2 h-4 w-4" />
+                      <Button className="w-full group-hover:bg-primary group-hover:text-primary-foreground" asChild>
+                        <Link to={`/lesson/${index + 1}`}>
+                          Start Learning
+                          <ChevronRight className="ml-2 h-4 w-4" />
+                        </Link>
                       </Button>
                     </div>
                   </CardContent>
