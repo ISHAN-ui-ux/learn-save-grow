@@ -22,10 +22,12 @@ import {
   Target,
   Star,
   Medal,
-  Crown
+  Crown,
+  PieChart
 } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
+import { PieChart as RechartsPieChart, Cell, ResponsiveContainer, Tooltip, Legend, Pie } from "recharts";
 
 type InvestmentType = "savings" | "cd" | "index" | "stock" | "bonds" | "commodity";
 
@@ -39,6 +41,8 @@ interface Investment {
   trend?: "up" | "down";
   price?: number;
   interestRate?: number;
+  unlocked: boolean;
+  returnRate?: number;
 }
 
 interface RandomEvent {
@@ -150,6 +154,7 @@ const StackYourFuture = () => {
   const [showPaymentOptions, setShowPaymentOptions] = useState(false);
   const [paymentInvestments, setPaymentInvestments] = useState<Investment[]>([]);
   const [pendingPayment, setPendingPayment] = useState<{ amount: number; reason: string } | null>(null);
+  const [showPortfolio, setShowPortfolio] = useState(false);
   const { toast } = useToast();
 
   const achievements: Achievement[] = [
@@ -244,7 +249,9 @@ const StackYourFuture = () => {
       balance: 0,
       profit: 0,
       type: "savings",
-      interestRate: 0.02
+      interestRate: 0.02,
+      unlocked: true,
+      returnRate: 0.02
     },
     {
       id: "cd",
@@ -252,7 +259,9 @@ const StackYourFuture = () => {
       balance: 0,
       profit: 0,
       type: "cd",
-      interestRate: 0.035
+      interestRate: 0.035,
+      unlocked: true,
+      returnRate: 0.035
     },
     {
       id: "index",
@@ -260,7 +269,9 @@ const StackYourFuture = () => {
       balance: 0,
       profit: 0,
       type: "index",
-      price: 100
+      price: 100,
+      unlocked: true,
+      returnRate: 0.08
     },
     {
       id: "electric-inc",
@@ -270,7 +281,9 @@ const StackYourFuture = () => {
       profit: 0,
       type: "stock",
       trend: "up",
-      price: 45.50
+      price: 45.50,
+      unlocked: true,
+      returnRate: 0.12
     },
     {
       id: "big-bank",
@@ -280,7 +293,9 @@ const StackYourFuture = () => {
       profit: 0,
       type: "stock",
       trend: "up",
-      price: 32.25
+      price: 32.25,
+      unlocked: true,
+      returnRate: 0.10
     },
     {
       id: "strong-oil",
@@ -290,7 +305,9 @@ const StackYourFuture = () => {
       profit: 0,
       type: "stock",
       trend: "down",
-      price: 28.75
+      price: 28.75,
+      unlocked: false,
+      returnRate: 0.15
     },
     {
       id: "bonds",
@@ -298,7 +315,9 @@ const StackYourFuture = () => {
       balance: 0,
       profit: 0,
       type: "bonds",
-      interestRate: 0.025
+      interestRate: 0.025,
+      unlocked: false,
+      returnRate: 0.025
     },
     {
       id: "wheat",
@@ -306,7 +325,9 @@ const StackYourFuture = () => {
       balance: 0,
       profit: 0,
       type: "commodity",
-      price: 15.50
+      price: 15.50,
+      unlocked: false,
+      returnRate: 0.18
     },
     {
       id: "gold",
@@ -314,7 +335,9 @@ const StackYourFuture = () => {
       balance: 0,
       profit: 0,
       type: "commodity",
-      price: 1950.00
+      price: 1950.00,
+      unlocked: false,
+      returnRate: 0.20
     }
   ]);
 
@@ -357,6 +380,29 @@ const StackYourFuture = () => {
       }
     }
   }, [currentYear, netWorth]);
+
+  // Check for unlocking new investments
+  useEffect(() => {
+    const unlockThresholds = [
+      { id: "strong-oil", threshold: 10000, name: "Strong Oil Co." },
+      { id: "bonds", threshold: 25000, name: "Government Bonds" },
+      { id: "wheat", threshold: 50000, name: "Wheat Commodity" },
+      { id: "gold", threshold: 100000, name: "Gold Investment" }
+    ];
+
+    unlockThresholds.forEach(({ id, threshold, name }) => {
+      const investment = investments.find(inv => inv.id === id);
+      if (investment && !investment.unlocked && netWorth >= threshold) {
+        setInvestments(prev => prev.map(inv => 
+          inv.id === id ? { ...inv, unlocked: true } : inv
+        ));
+        toast({
+          title: "🔓 New Investment Unlocked!",
+          description: `You can now invest in ${name}! Net worth: $${netWorth.toLocaleString()}`,
+        });
+      }
+    });
+  }, [netWorth, investments]);
 
   // Check achievements
   const checkAchievements = () => {
@@ -402,12 +448,12 @@ const StackYourFuture = () => {
     } else {
       setCurrentPeriod(1);
       setCurrentYear(prev => prev + 1);
-      setPocketCash(prev => prev + 1000);
+      setPocketCash(prev => prev + 5000); // $5000 per year completion
       updateInvestmentProfits();
       updateStockPrices();
       toast({
         title: "📅 New Year Started",
-        description: `Welcome to Year ${currentYear + 1}! You received $1,000.`
+        description: `Welcome to Year ${currentYear + 1}! You received $5,000 for completing the year.`
       });
     }
     setTimeRemaining(60); // Reset timer
@@ -427,45 +473,26 @@ const StackYourFuture = () => {
 
   const updateInvestmentProfits = () => {
     setInvestments(prev => prev.map(inv => {
+      if (inv.balance === 0) return inv; // No profit if no investment
+      
       let profitChange = 0;
+      const volatility = Math.random() - 0.5; // -0.5 to +0.5
+      const baseReturn = inv.returnRate || 0.08;
       
-      // Random growth and income generation
-      const isGrowthPeriod = Math.random() > 0.3; // 70% chance of growth
+      // Make stocks more volatile, bonds more stable
+      const multiplier = inv.type === "stock" ? 2.5 : inv.type === "commodity" ? 2.0 : 1.0;
+      const actualReturn = baseReturn + (volatility * multiplier * 0.4);
       
-      switch (inv.type) {
-        case "savings":
-        case "cd":
-        case "bonds":
-          if (isGrowthPeriod) {
-            profitChange = inv.balance * (inv.interestRate || 0.02) * (0.5 + Math.random() * 0.5);
-          } else {
-            profitChange = inv.balance * (inv.interestRate || 0.02) * -0.2; // Sometimes lose income
-          }
-          break;
-        case "index":
-          if (isGrowthPeriod) {
-            profitChange = inv.balance * (Math.random() * 0.15 + 0.05); // 5-20% growth
-          } else {
-            profitChange = inv.balance * (Math.random() * -0.1 - 0.05); // 5-15% loss
-          }
-          break;
-        case "stock":
-          if (isGrowthPeriod) {
-            profitChange = inv.balance * (Math.random() * 0.25 + 0.05); // 5-30% growth
-          } else {
-            profitChange = inv.balance * (Math.random() * -0.2 - 0.05); // 5-25% loss
-          }
-          break;
-        case "commodity":
-          if (isGrowthPeriod) {
-            profitChange = inv.balance * (Math.random() * 0.2 + 0.03); // 3-23% growth
-          } else {
-            profitChange = inv.balance * (Math.random() * -0.15 - 0.03); // 3-18% loss
-          }
-          break;
-      }
+      profitChange = inv.balance * actualReturn * (Math.random() * 0.5 + 0.5); // Random timing
       
-      return { ...inv, profit: inv.profit + profitChange };
+      // Show clear gains/losses
+      const trend = profitChange > 0 ? "up" : "down";
+      
+      return { 
+        ...inv, 
+        profit: inv.profit + profitChange,
+        trend: inv.type === "stock" ? trend : inv.trend
+      };
     }));
   };
 
@@ -728,10 +755,6 @@ const StackYourFuture = () => {
                 <Card className="bg-slate-800 text-white border-slate-700">
                   <CardContent className="p-4">
                     <div className="space-y-2">
-                      <Button variant="ghost" className="w-full justify-start text-white hover:bg-slate-600">
-                        <Trophy className="h-4 w-4 mr-2" />
-                        LEADERBOARD
-                      </Button>
                       <Button 
                         variant="ghost" 
                         className="w-full justify-start text-white hover:bg-purple-600"
@@ -740,8 +763,12 @@ const StackYourFuture = () => {
                         <Award className="h-4 w-4 mr-2" />
                         ACHIEVEMENTS ({earnedAchievements.length}/{achievements.length})
                       </Button>
-                      <Button variant="ghost" className="w-full justify-start text-white hover:bg-slate-600">
-                        <Briefcase className="h-4 w-4 mr-2" />
+                      <Button 
+                        variant="ghost" 
+                        className="w-full justify-start text-white hover:bg-slate-600"
+                        onClick={() => setShowPortfolio(true)}
+                      >
+                        <PieChart className="h-4 w-4 mr-2" />
                         PORTFOLIO
                       </Button>
                     </div>
@@ -766,7 +793,7 @@ const StackYourFuture = () => {
                 </div>
 
                 <div className="grid grid-cols-3 gap-4">
-                  {investments.map((investment) => (
+                  {investments.filter(inv => inv.unlocked).map((investment) => (
                     <Card key={investment.id} className="bg-gradient-to-br from-slate-800 to-slate-900 border-2 border-slate-600 text-white">
                       <CardHeader className="pb-2">
                         <div className="flex items-center justify-between">
@@ -813,11 +840,16 @@ const StackYourFuture = () => {
                           <div>
                             <div className="text-xs text-slate-400">PROFIT/LOSS</div>
                             <div className={`font-bold ${investment.profit >= 0 ? "text-green-400" : "text-red-400"}`}>
-                              {investment.profit >= 0 ? "+" : "-"}${Math.abs(investment.profit).toLocaleString(undefined, { minimumFractionDigits: 2 })}
+                              {investment.profit >= 0 ? "+" : ""}${investment.profit.toLocaleString(undefined, { minimumFractionDigits: 2 })}
                             </div>
                             <div className={`text-xs font-semibold ${investment.profit >= 0 ? "text-green-300" : "text-red-300"}`}>
                               {investment.profit >= 0 ? "📈 GAINING" : "📉 LOSING"}
                             </div>
+                            {investment.balance > 0 && (
+                              <div className={`text-xs ${investment.profit >= 0 ? "text-green-400" : "text-red-400"}`}>
+                                Return: {((investment.profit / investment.balance) * 100).toFixed(1)}%
+                              </div>
+                            )}
                           </div>
                           {investment.price && (
                             <div>
@@ -1035,38 +1067,134 @@ const StackYourFuture = () => {
 
       {/* Investment Dialog */}
       <Dialog open={showInvestmentDialog} onOpenChange={setShowInvestmentDialog}>
-        <DialogContent>
+        <DialogContent className="bg-slate-800 text-white border-slate-600">
           <DialogHeader>
-            <DialogTitle>{actionType} - {selectedInvestment?.title}</DialogTitle>
-            <DialogDescription>
-              {actionType === "BUY" || actionType === "DEPOSIT" 
-                ? `How much would you like to ${actionType.toLowerCase()}?`
-                : `How much would you like to ${actionType.toLowerCase()}?`
+            <DialogTitle className="text-white">
+              {actionType} - {selectedInvestment?.title}
+            </DialogTitle>
+            <DialogDescription className="text-slate-300">
+              {actionType === "DEPOSIT" || actionType === "BUY" 
+                ? `Enter the amount you want to ${actionType.toLowerCase()}`
+                : `Enter the amount you want to ${actionType.toLowerCase()}`
               }
             </DialogDescription>
           </DialogHeader>
           <div className="space-y-4">
-            <Input
-              type="number"
-              placeholder="Enter amount"
-              value={investmentAmount}
-              onChange={(e) => setInvestmentAmount(e.target.value)}
-            />
-            <div className="text-sm text-muted-foreground">
-              Available cash: ${pocketCash.toLocaleString(undefined, { minimumFractionDigits: 2 })}
-              {selectedInvestment && (
-                <div>Current balance: ${selectedInvestment.balance.toLocaleString(undefined, { minimumFractionDigits: 2 })}</div>
-              )}
+            <div>
+              <label className="text-sm text-slate-300">Amount ($)</label>
+              <Input
+                type="number"
+                value={investmentAmount}
+                onChange={(e) => setInvestmentAmount(e.target.value)}
+                placeholder="Enter amount"
+                className="bg-slate-700 text-white border-slate-600"
+              />
             </div>
+            {selectedInvestment?.price && (actionType === "BUY" || actionType === "SELL") && (
+              <div className="text-sm text-slate-300">
+                Price per share: ${selectedInvestment.price.toFixed(2)}
+                {investmentAmount && (
+                  <div>
+                    Shares: {Math.floor(parseFloat(investmentAmount) / selectedInvestment.price)}
+                  </div>
+                )}
+              </div>
+            )}
+            {selectedInvestment && (
+              <div className="text-sm text-slate-300 bg-slate-700 p-2 rounded">
+                Expected Return Rate: {((selectedInvestment.returnRate || 0) * 100).toFixed(1)}% annually
+              </div>
+            )}
           </div>
           <DialogFooter>
-            <Button variant="outline" onClick={() => setShowInvestmentDialog(false)}>
+            <Button 
+              variant="outline" 
+              onClick={() => setShowInvestmentDialog(false)}
+              className="border-slate-600 text-white hover:bg-slate-700"
+            >
               Cancel
             </Button>
-            <Button onClick={handleInvestmentAction}>
+            <Button 
+              onClick={handleInvestmentAction}
+              className="bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700"
+            >
               {actionType}
             </Button>
           </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Portfolio Dialog */}
+      <Dialog open={showPortfolio} onOpenChange={setShowPortfolio}>
+        <DialogContent className="bg-slate-800 text-white border-slate-600 max-w-4xl">
+          <DialogHeader>
+            <DialogTitle className="text-white text-2xl">📊 Your Investment Portfolio</DialogTitle>
+            <DialogDescription className="text-slate-300">
+              Current allocation of your investments
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-6">
+            {totalInvested > 0 ? (
+              <>
+                <div className="h-80">
+                  <ResponsiveContainer width="100%" height="100%">
+                    <RechartsPieChart>
+                      <Pie
+                        data={investments
+                          .filter(inv => inv.balance > 0)
+                          .map(inv => ({
+                            name: inv.title,
+                            value: inv.balance,
+                            fill: inv.type === "stock" ? "#10b981" : 
+                                  inv.type === "index" ? "#3b82f6" :
+                                  inv.type === "savings" ? "#8b5cf6" :
+                                  inv.type === "bonds" ? "#f59e0b" :
+                                  "#ef4444"
+                          }))}
+                        cx="50%"
+                        cy="50%"
+                        outerRadius={120}
+                        dataKey="value"
+                        label={({ name, percent }) => `${name}: ${(percent * 100).toFixed(1)}%`}
+                      >
+                        {investments.filter(inv => inv.balance > 0).map((entry, index) => (
+                          <Cell key={`cell-${index}`} fill={
+                            entry.type === "stock" ? "#10b981" : 
+                            entry.type === "index" ? "#3b82f6" :
+                            entry.type === "savings" ? "#8b5cf6" :
+                            entry.type === "bonds" ? "#f59e0b" :
+                            "#ef4444"
+                          } />
+                        ))}
+                      </Pie>
+                      <Tooltip 
+                        formatter={(value: number) => [`$${value.toLocaleString()}`, 'Investment']}
+                        contentStyle={{ backgroundColor: '#1e293b', border: '1px solid #475569' }}
+                      />
+                      <Legend />
+                    </RechartsPieChart>
+                  </ResponsiveContainer>
+                </div>
+                <div className="grid grid-cols-2 gap-4">
+                  {investments.filter(inv => inv.balance > 0).map(inv => (
+                    <div key={inv.id} className="bg-slate-700 p-3 rounded">
+                      <div className="font-bold">{inv.title}</div>
+                      <div className="text-green-400">${inv.balance.toLocaleString()}</div>
+                      <div className={`text-sm ${inv.profit >= 0 ? 'text-green-300' : 'text-red-300'}`}>
+                        Profit: ${inv.profit.toFixed(2)}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </>
+            ) : (
+              <div className="text-center py-8">
+                <div className="text-6xl mb-4">📈</div>
+                <div className="text-xl text-slate-300">No investments yet!</div>
+                <div className="text-slate-400">Start investing to see your portfolio</div>
+              </div>
+            )}
+          </div>
         </DialogContent>
       </Dialog>
     </div>
