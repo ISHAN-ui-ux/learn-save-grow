@@ -31,9 +31,38 @@ interface ActivityProps {
 }
 
 export const InteractiveActivity = ({ lessonId, stepIndex }: ActivityProps) => {
+  // All state at component level to follow Rules of Hooks
   const [currentInput, setCurrentInput] = useState<any>({});
   const [completed, setCompleted] = useState(false);
   const [score, setScore] = useState(0);
+  
+  // Quiz state
+  const [selectedAnswer, setSelectedAnswer] = useState<number | null>(null);
+  
+  // Budget builder state  
+  const [income, setIncome] = useState(0);
+  
+  // Expense tracker state
+  const [expenses, setExpenses] = useState<Array<{name: string, amount: number, category: string}>>([]);
+  const [newExpense, setNewExpense] = useState({name: '', amount: 0, category: 'Fixed'});
+  
+  // Compound interest state
+  const [principal, setPrincipal] = useState(1000);
+  const [rate, setRate] = useState(7);
+  const [years, setYears] = useState(10);
+  
+  // Needs vs wants state
+  const [categorized, setCategorized] = useState<Record<string, string>>({});
+  
+  // Currency converter state
+  const [amount, setAmount] = useState(100);
+  const [fromCurrency, setFromCurrency] = useState('USD');
+  const [toCurrency, setToCurrency] = useState('EUR');
+  
+  // Bill splitter state
+  const [totalAmount, setTotalAmount] = useState(0);
+  const [people, setPeople] = useState(2);
+  const [splitMethod, setSplitMethod] = useState('equal');
 
   const activities = [
     // Lesson 1: Introduction to Money
@@ -474,8 +503,6 @@ export const InteractiveActivity = ({ lessonId, stepIndex }: ActivityProps) => {
   };
 
   const renderQuiz = (quiz: any) => {
-    const [selectedAnswer, setSelectedAnswer] = useState<number | null>(null);
-    
     return (
       <div className="space-y-4">
         {quiz.questions.map((q: any, index: number) => (
@@ -499,7 +526,6 @@ export const InteractiveActivity = ({ lessonId, stepIndex }: ActivityProps) => {
   };
 
   const renderBudgetBuilder = () => {
-    const [income, setIncome] = useState(0);
     const needs = income * 0.5;
     const wants = income * 0.3;
     const savings = income * 0.2;
@@ -568,9 +594,6 @@ export const InteractiveActivity = ({ lessonId, stepIndex }: ActivityProps) => {
   };
 
   const renderExpenseTracker = () => {
-    const [expenses, setExpenses] = useState<Array<{name: string, amount: number, category: string}>>([]);
-    const [newExpense, setNewExpense] = useState({name: '', amount: 0, category: 'Fixed'});
-
     const addExpense = () => {
       if (newExpense.name && newExpense.amount > 0) {
         setExpenses([...expenses, newExpense]);
@@ -651,10 +674,6 @@ export const InteractiveActivity = ({ lessonId, stepIndex }: ActivityProps) => {
   };
 
   const renderCompoundInterest = () => {
-    const [principal, setPrincipal] = useState(1000);
-    const [rate, setRate] = useState(7);
-    const [years, setYears] = useState(10);
-    
     const finalAmount = principal * Math.pow(1 + rate/100, years);
     const totalInterest = finalAmount - principal;
 
@@ -730,7 +749,6 @@ export const InteractiveActivity = ({ lessonId, stepIndex }: ActivityProps) => {
   };
 
   const renderNeedsVsWants = () => {
-    const [categorized, setCategorized] = useState<Record<string, string>>({});
     const items = (activity as any).items || [];
     
     const handleCategorize = (item: string, category: string) => {
@@ -790,10 +808,6 @@ export const InteractiveActivity = ({ lessonId, stepIndex }: ActivityProps) => {
   };
 
   const renderCurrencyConverter = () => {
-    const [amount, setAmount] = useState(100);
-    const [fromCurrency, setFromCurrency] = useState('USD');
-    const [toCurrency, setToCurrency] = useState('EUR');
-    
     // Mock exchange rates for demo
     const exchangeRates: Record<string, number> = {
       'USD': 1,
@@ -865,10 +879,6 @@ export const InteractiveActivity = ({ lessonId, stepIndex }: ActivityProps) => {
   };
 
   const renderBillSplitter = () => {
-    const [totalAmount, setTotalAmount] = useState(0);
-    const [people, setPeople] = useState(2);
-    const [splitMethod, setSplitMethod] = useState('equal');
-    
     const perPerson = totalAmount / people;
     
     return (
