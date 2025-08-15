@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { Badge } from "@/components/ui/badge";
+import { InteractiveActivity } from "@/components/InteractiveActivity";
 import { 
   ArrowLeft, 
   ArrowRight, 
@@ -1009,24 +1010,11 @@ Modern economies rely heavily on the velocity of money - how quickly money circu
                   {currentLesson.steps[currentStep]?.content}
                 </p>
                 
-                {/* Interactive Activity Area */}
-                <div className="bg-kids-primary/10 rounded-xl p-8 mb-6">
-                  <h3 className="text-xl font-semibold text-kids-primary mb-4">
-                    🎯 Activity Time!
-                  </h3>
-                  <p className="text-muted-foreground">
-                    {currentLesson.steps[currentStep]?.activity}
-                  </p>
-                  
-                  {/* Activity Placeholder */}
-                  <div className="mt-6 p-6 bg-white/50 rounded-lg border-2 border-dashed border-kids-accent/30">
-                    <Play className="h-12 w-12 text-kids-accent mx-auto mb-4" />
-                    <p className="text-kids-primary font-semibold">Interactive Activity Coming Soon!</p>
-                    <p className="text-sm text-muted-foreground">
-                      This is where the interactive lesson content will be displayed.
-                    </p>
-                  </div>
-                </div>
+                {/* Interactive Activity */}
+                <InteractiveActivity 
+                  lessonId={currentLesson.id} 
+                  stepIndex={currentStep} 
+                />
               </div>
 
               {/* Navigation Buttons */}
