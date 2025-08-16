@@ -71,8 +71,17 @@ export const InteractiveActivity = ({ lessonId, stepIndex, onComplete }: Activit
   const [people, setPeople] = useState(2);
   const [splitMethod, setSplitMethod] = useState('equal');
 
-  // AI Grading function
-  const gradeResponse = async (question: string, response: string, answerKey: string, activityType: string, rubric: string) => {
+  // AI Grading function with word count validation
+  const gradeResponse = async (question: string, response: string, answerKey: string, activityType: string, rubric: string, minWords?: number) => {
+    // Check word count for short answers and essays
+    if (minWords) {
+      const wordCount = response.trim().split(/\s+/).filter(word => word.length > 0).length;
+      if (wordCount < minWords) {
+        toast.error(`Response too short. You need at least ${minWords} words. You have ${wordCount} words.`);
+        return;
+      }
+    }
+    
     setIsGrading(true);
     try {
       const { data, error } = await supabase.functions.invoke('ai-grade-response', {
@@ -82,6 +91,7 @@ export const InteractiveActivity = ({ lessonId, stepIndex, onComplete }: Activit
       if (error) throw error;
       
       setGradingResult(data);
+      setCompleted(true);
       toast.success(`Graded! Score: ${data.score}/100 (${data.grade})`);
       
       // Call onComplete callback if provided
