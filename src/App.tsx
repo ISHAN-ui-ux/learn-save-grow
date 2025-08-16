@@ -24,13 +24,10 @@ const App = () => (
           <Route path="/" element={<Index />} />
           <Route path="/category/:categoryId" element={<Category />} />
           <Route path="/lesson/:categoryId/:lessonId" element={<Lesson />} />
-          {/* Legacy route redirect */}
-          <Route path="/lesson/:lessonId" element={<Category />} />
           <Route path="/chat" element={<Chat />} />
           <Route path="/blog" element={<Blog />} />
           <Route path="/blog/:id" element={<BlogPost />} />
           <Route path="/stack-your-future" element={<StackYourFuture />} />
-          {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>
