@@ -29,9 +29,10 @@ import {
 interface ActivityProps {
   lessonId: number;
   stepIndex: number;
+  onComplete?: (result: any) => void;
 }
 
-export const InteractiveActivity = ({ lessonId, stepIndex }: ActivityProps) => {
+export const InteractiveActivity = ({ lessonId, stepIndex, onComplete }: ActivityProps) => {
   // All state at component level to follow Rules of Hooks
   const [currentInput, setCurrentInput] = useState<any>({});
   const [completed, setCompleted] = useState(false);
@@ -82,6 +83,11 @@ export const InteractiveActivity = ({ lessonId, stepIndex }: ActivityProps) => {
       
       setGradingResult(data);
       toast.success(`Graded! Score: ${data.score}/100 (${data.grade})`);
+      
+      // Call onComplete callback if provided
+      if (onComplete) {
+        onComplete(data);
+      }
     } catch (error) {
       console.error('Grading error:', error);
       toast.error('Failed to grade response. Please try again.');
