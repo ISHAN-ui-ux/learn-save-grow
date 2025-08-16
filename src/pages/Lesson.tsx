@@ -6,15 +6,15 @@ export default function Lesson() {
   const categoryIndex = parseInt(categoryId || "1");
   const lessonIndex = parseInt(lessonId || "1");
 
-  // Single comprehensive 20-slide financial literacy course
+  // Single comprehensive financial literacy slideshow
   const categories = [
     {
       id: 1,
-      title: "Complete Financial Literacy Masterclass",
+      title: "Financial Literacy Masterclass",
       lessons: [
         {
           id: 1,
-          title: "Complete Financial Literacy Course - 20 Comprehensive Slides",
+          title: "Complete Financial Literacy - 20 Slides + Interactive Activities",
           content: `## Slide 1: Introduction to Personal Finance
 
 Personal finance is the comprehensive management of your financial resources to achieve both short-term needs and long-term life goals. According to the Federal Reserve's 2022 Survey of Consumer Finances, the median American household has $5,300 in savings, while 37% of Americans cannot cover a $400 emergency expense without borrowing. This course will transform your financial understanding and empower you to build lasting wealth.
