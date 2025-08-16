@@ -11,6 +11,7 @@ import { Slider } from "@/components/ui/slider";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Checkbox } from "@/components/ui/checkbox";
 import { toast } from "sonner";
+import { supabase } from "@/integrations/supabase/client";
 import { 
   Calculator, 
   PiggyBank, 
@@ -35,9 +36,14 @@ export const InteractiveActivity = ({ lessonId, stepIndex }: ActivityProps) => {
   const [currentInput, setCurrentInput] = useState<any>({});
   const [completed, setCompleted] = useState(false);
   const [score, setScore] = useState(0);
+  const [isGrading, setIsGrading] = useState(false);
+  const [gradingResult, setGradingResult] = useState<any>(null);
+  const [showAnswerKey, setShowAnswerKey] = useState(false);
   
   // Quiz state
   const [selectedAnswer, setSelectedAnswer] = useState<number | null>(null);
+  const [selectedAnswers, setSelectedAnswers] = useState<Record<number, number>>({});
+  const [textResponse, setTextResponse] = useState('');
   
   // Budget builder state  
   const [income, setIncome] = useState(0);
@@ -64,43 +70,124 @@ export const InteractiveActivity = ({ lessonId, stepIndex }: ActivityProps) => {
   const [people, setPeople] = useState(2);
   const [splitMethod, setSplitMethod] = useState('equal');
 
+  // AI Grading function
+  const gradeResponse = async (question: string, response: string, answerKey: string, activityType: string, rubric: string) => {
+    setIsGrading(true);
+    try {
+      const { data, error } = await supabase.functions.invoke('ai-grade-response', {
+        body: { question, response, answerKey, activityType, rubric }
+      });
+      
+      if (error) throw error;
+      
+      setGradingResult(data);
+      toast.success(`Graded! Score: ${data.score}/100 (${data.grade})`);
+    } catch (error) {
+      console.error('Grading error:', error);
+      toast.error('Failed to grade response. Please try again.');
+    } finally {
+      setIsGrading(false);
+    }
+  };
+
   const activities = [
-    // Lesson 1: Introduction to Money
+    // Lesson 1: Introduction to Money - EXPANDED
     [
       {
-        type: "quiz",
-        title: "Money Functions Quiz",
-        description: "Test your understanding of money's primary functions",
+        type: "comprehensive_quiz",
+        title: "Complete Money Functions Assessment",
+        description: "Comprehensive test covering all aspects of money's role in the economy",
         questions: [
           {
             question: "What is the primary function of money as a medium of exchange?",
             options: [
               "It stores value over time",
-              "It eliminates the need for bartering", 
+              "It eliminates the need for bartering and facilitates trade", 
               "It provides a standard measure for pricing",
-              "It creates economic growth"
+              "It creates economic growth automatically"
             ],
-            correct: 1
+            correct: 1,
+            explanation: "Money as a medium of exchange eliminates the 'double coincidence of wants' problem in bartering, making trade much more efficient."
+          },
+          {
+            question: "Which of the following best describes money as a unit of account?",
+            options: [
+              "Money can be saved for future purchases",
+              "Money allows comparison of values of different goods and services",
+              "Money is accepted by everyone in transactions",
+              "Money maintains its purchasing power over time"
+            ],
+            correct: 1,
+            explanation: "As a unit of account, money provides a common measure to compare the relative worth of different items."
+          },
+          {
+            question: "What happens to money's effectiveness as a store of value during high inflation?",
+            options: [
+              "It becomes more valuable",
+              "It maintains the same value",
+              "Its purchasing power decreases significantly",
+              "It stops functioning as money entirely"
+            ],
+            correct: 2,
+            explanation: "High inflation erodes money's purchasing power, making it less effective as a store of value."
+          },
+          {
+            question: "Which characteristic is NOT essential for something to function as money?",
+            options: [
+              "Divisibility",
+              "Durability", 
+              "Physical beauty",
+              "Portability"
+            ],
+            correct: 2,
+            explanation: "While physical beauty might be nice, it's not essential for money to function. Utility, not aesthetics, matters."
+          },
+          {
+            question: "How did the introduction of money improve upon the barter system?",
+            options: [
+              "It made goods more expensive",
+              "It eliminated the need for any trade",
+              "It solved the double coincidence of wants problem",
+              "It guaranteed everyone would be wealthy"
+            ],
+            correct: 2,
+            explanation: "The barter system required both parties to want what the other had. Money eliminates this constraint."
           }
-        ]
+        ],
+        answerKey: "Questions 1-5 test understanding of money's three primary functions: medium of exchange, unit of account, and store of value. Students should demonstrate understanding of how money facilitates trade, provides measurement standards, and preserves value over time.",
+        rubric: "A: Shows complete understanding of all three functions with clear examples (90-100). B: Understands most concepts with minor gaps (80-89). C: Basic understanding with some confusion (70-79). D: Limited understanding (60-69). F: Little to no understanding (below 60)."
       },
       {
-        type: "exploration",
-        title: "Currency Security Features",
-        description: "Examine and identify security features on currency",
-        activity: "Upload a photo or describe 5 security features you can find on a dollar bill"
+        type: "written_analysis",
+        title: "Money Evolution Research Project",
+        description: "Research and analyze the historical evolution of money from barter to digital currency",
+        prompt: "Write a 500-word analysis covering: 1) Limitations of barter systems, 2) Development of commodity money (gold, silver), 3) Introduction of paper money, 4) Rise of electronic payments, 5) Emergence of digital currencies. Include specific examples and explain how each evolution solved previous limitations.",
+        answerKey: "Strong responses should include: Historical progression showing understanding of technological and economic drivers, specific examples of commodity money (gold standard, etc.), explanation of fiat money concepts, discussion of modern payment systems (credit cards, digital wallets), and emerging trends (cryptocurrency, CBDC). Should demonstrate understanding of why each evolution occurred.",
+        rubric: "Evaluate on: Historical accuracy (25%), understanding of economic concepts (25%), use of specific examples (25%), analysis of cause-and-effect relationships (25%). Look for understanding of why money evolved and how each form solved previous problems."
       },
       {
-        type: "tracker",
-        title: "Payment Method Tracker",
-        description: "Track your family's payment methods for comparison",
-        fields: ["Cash", "Credit Card", "Debit Card", "Mobile Payment", "Other"]
+        type: "case_study",
+        title: "Currency Crisis Analysis",
+        description: "Analyze a real-world example of currency crisis and its impact on money's functions",
+        prompt: "Choose one: 1) German hyperinflation (1921-1923), 2) Zimbabwe hyperinflation (2000s), or 3) Venezuelan bolivar crisis (2010s). Analyze how the crisis affected money's ability to function as a medium of exchange, unit of account, and store of value. What alternatives did people use? What lessons can we learn?",
+        answerKey: "Students should identify specific impacts on each function of money: Medium of exchange (people rejecting currency, reverting to barter), Unit of account (prices changing rapidly, difficulty in pricing), Store of value (savings becoming worthless). Should mention alternative strategies like foreign currency adoption, commodity money, or digital alternatives.",
+        rubric: "Analysis depth (30%), accurate use of economic terminology (25%), specific examples and data (25%), conclusions and lessons learned (20%). Look for understanding of how economic instability affects money's fundamental functions."
       },
       {
-        type: "calculator",
+        type: "interactive_timeline",
+        title: "Payment Methods Timeline Builder",
+        description: "Build a timeline showing the evolution of payment methods from barter to digital",
+        prompt: "Create a comprehensive timeline showing the evolution of payment methods. Include at least 10 major milestones from barter systems to cryptocurrency. For each milestone, explain: 1) What problem it solved, 2) How it worked, 3) Its advantages and limitations, 4) Why it was eventually replaced or evolved. Include dates and specific examples.",
+        answerKey: "Timeline should include: Barter system (limitations), Commodity money (shells, livestock), Metal coins (standardization), Paper money (convenience), Banking systems (security), Credit cards (convenience and credit), Electronic transfers (speed), Online payments (e-commerce), Mobile payments (accessibility), Cryptocurrency (decentralization). Each entry should show clear progression and problem-solving.",
+        rubric: "Historical accuracy (25%), completeness of timeline (25%), understanding of technological progression (25%), analysis of each method's advantages/limitations (25%)."
+      },
+      {
+        type: "inflation_calculator", 
         title: "Inflation Impact Calculator",
         description: "Calculate how inflation affects purchasing power over time",
-        calculation: "inflation"
+        prompt: "Use the calculator to explore different inflation scenarios. Calculate: 1) How much $100 from 1990 would be worth today, 2) How much a $50,000 salary from 2000 would need to be today to have the same purchasing power, 3) The impact of 2% vs 5% vs 10% annual inflation over 20 years on $10,000. Explain what these calculations teach us about money as a store of value.",
+        answerKey: "Students should demonstrate understanding that inflation erodes purchasing power over time. $100 in 1990 is worth significantly more in today's dollars. Higher inflation rates dramatically reduce the real value of money over time. This illustrates why money isn't perfect as a store of value and why investments that outpace inflation are important.",
+        rubric: "Accurate calculations (30%), understanding of purchasing power concept (30%), analysis of different inflation scenarios (25%), conclusions about money's store of value function (15%)."
       }
     ],
     // Lesson 2: Income and Employment
@@ -942,8 +1029,193 @@ export const InteractiveActivity = ({ lessonId, stepIndex }: ActivityProps) => {
     );
   };
 
+  // Render comprehensive quiz with AI grading
+  const renderComprehensiveQuiz = (quiz: any) => {
+    return (
+      <div className="space-y-6">
+        {quiz.questions.map((q: any, index: number) => (
+          <Card key={index} className="p-4">
+            <h4 className="font-medium mb-3">{q.question}</h4>
+            <RadioGroup 
+              value={selectedAnswers[index]?.toString()} 
+              onValueChange={(value) => setSelectedAnswers({...selectedAnswers, [index]: parseInt(value)})}
+            >
+              {q.options.map((option: string, optionIndex: number) => (
+                <div key={optionIndex} className="flex items-center space-x-2">
+                  <RadioGroupItem value={optionIndex.toString()} id={`q${index}-option-${optionIndex}`} />
+                  <Label htmlFor={`q${index}-option-${optionIndex}`}>{option}</Label>
+                </div>
+              ))}
+            </RadioGroup>
+            {showAnswerKey && (
+              <div className="mt-3 p-3 bg-muted rounded-lg">
+                <p className="text-sm font-medium text-green-600">Correct Answer: {q.options[q.correct]}</p>
+                <p className="text-sm text-muted-foreground mt-1">{q.explanation}</p>
+              </div>
+            )}
+          </Card>
+        ))}
+        
+        <div className="flex gap-3">
+          <Button 
+            onClick={() => {
+              const responses = Object.values(selectedAnswers).join(', ');
+              gradeResponse(
+                quiz.questions.map((q: any) => q.question).join('; '), 
+                responses, 
+                quiz.answerKey, 
+                'comprehensive_quiz', 
+                quiz.rubric
+              );
+            }} 
+            disabled={Object.keys(selectedAnswers).length < quiz.questions.length || isGrading}
+          >
+            {isGrading ? "Grading..." : "Submit Quiz"}
+          </Button>
+          <Button variant="outline" onClick={() => setShowAnswerKey(!showAnswerKey)}>
+            {showAnswerKey ? "Hide" : "Show"} Answer Key
+          </Button>
+        </div>
+
+        {gradingResult && (
+          <Card className="mt-4">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                Score: {gradingResult.score}/100 ({gradingResult.grade})
+                {gradingResult.score >= 90 ? <CheckCircle className="h-5 w-5 text-green-500" /> : 
+                 gradingResult.score >= 70 ? <AlertCircle className="h-5 w-5 text-yellow-500" /> :
+                 <AlertCircle className="h-5 w-5 text-red-500" />}
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-3">
+              <div>
+                <h5 className="font-medium text-green-600">Strengths:</h5>
+                <ul className="list-disc list-inside text-sm text-muted-foreground">
+                  {gradingResult.strengths?.map((strength: string, i: number) => (
+                    <li key={i}>{strength}</li>
+                  ))}
+                </ul>
+              </div>
+              <div>
+                <h5 className="font-medium text-blue-600">Areas for Improvement:</h5>
+                <ul className="list-disc list-inside text-sm text-muted-foreground">
+                  {gradingResult.improvements?.map((improvement: string, i: number) => (
+                    <li key={i}>{improvement}</li>
+                  ))}
+                </ul>
+              </div>
+              <div>
+                <h5 className="font-medium">Detailed Feedback:</h5>
+                <p className="text-sm text-muted-foreground">{gradingResult.feedback}</p>
+              </div>
+            </CardContent>
+          </Card>
+        )}
+      </div>
+    );
+  };
+
+  // Render written analysis with AI grading
+  const renderWrittenAnalysis = (activity: any) => {
+    return (
+      <div className="space-y-6">
+        <div className="bg-primary/10 rounded-lg p-4">
+          <h4 className="font-semibold mb-2">Assignment:</h4>
+          <p className="text-sm text-muted-foreground">{activity.prompt}</p>
+        </div>
+        
+        <div>
+          <Label htmlFor="response">Your Response</Label>
+          <Textarea
+            id="response"
+            placeholder="Write your comprehensive analysis here..."
+            value={textResponse}
+            onChange={(e) => setTextResponse(e.target.value)}
+            rows={10}
+            className="mt-2"
+          />
+          <p className="text-xs text-muted-foreground mt-1">
+            Word count: {textResponse.split(' ').filter(word => word.length > 0).length}
+          </p>
+        </div>
+
+        <div className="flex gap-3">
+          <Button 
+            onClick={() => gradeResponse(activity.prompt, textResponse, activity.answerKey, 'written_analysis', activity.rubric)}
+            disabled={textResponse.length < 100 || isGrading}
+          >
+            {isGrading ? "Grading..." : "Submit for AI Grading"}
+          </Button>
+          <Button variant="outline" onClick={() => setShowAnswerKey(!showAnswerKey)}>
+            {showAnswerKey ? "Hide" : "Show"} Grading Rubric
+          </Button>
+        </div>
+
+        {showAnswerKey && (
+          <Card>
+            <CardHeader>
+              <CardTitle>Grading Rubric & Answer Key</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-3">
+              <div>
+                <h5 className="font-medium">Expected Elements:</h5>
+                <p className="text-sm text-muted-foreground">{activity.answerKey}</p>
+              </div>
+              <div>
+                <h5 className="font-medium">Grading Criteria:</h5>
+                <p className="text-sm text-muted-foreground">{activity.rubric}</p>
+              </div>
+            </CardContent>
+          </Card>
+        )}
+
+        {gradingResult && (
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                Score: {gradingResult.score}/100 ({gradingResult.grade})
+                {gradingResult.score >= 90 ? <CheckCircle className="h-5 w-5 text-green-500" /> : 
+                 gradingResult.score >= 70 ? <AlertCircle className="h-5 w-5 text-yellow-500" /> :
+                 <AlertCircle className="h-5 w-5 text-red-500" />}
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-3">
+              <div>
+                <h5 className="font-medium text-green-600">Strengths:</h5>
+                <ul className="list-disc list-inside text-sm text-muted-foreground">
+                  {gradingResult.strengths?.map((strength: string, i: number) => (
+                    <li key={i}>{strength}</li>
+                  ))}
+                </ul>
+              </div>
+              <div>
+                <h5 className="font-medium text-blue-600">Areas for Improvement:</h5>
+                <ul className="list-disc list-inside text-sm text-muted-foreground">
+                  {gradingResult.improvements?.map((improvement: string, i: number) => (
+                    <li key={i}>{improvement}</li>
+                  ))}
+                </ul>
+              </div>
+              <div>
+                <h5 className="font-medium">Detailed Feedback:</h5>
+                <p className="text-sm text-muted-foreground">{gradingResult.feedback}</p>
+              </div>
+            </CardContent>
+          </Card>
+        )}
+      </div>
+    );
+  };
+
   const renderActivity = () => {
     switch (activity.type) {
+      case 'comprehensive_quiz':
+        return renderComprehensiveQuiz(activity);
+      case 'written_analysis':
+      case 'case_study':
+      case 'interactive_timeline':
+      case 'inflation_calculator':
+        return renderWrittenAnalysis(activity);
       case 'quiz':
       case 'credit_score_quiz':
       case 'digital_safety_quiz':
