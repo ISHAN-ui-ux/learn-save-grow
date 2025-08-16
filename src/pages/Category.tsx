@@ -20,14 +20,7 @@ import {
 } from "lucide-react";
 
 export default function Category() {
-  const { categoryId, lessonId } = useParams();
-  
-  // Handle legacy URLs like /lesson/1 
-  if (lessonId && !categoryId) {
-    const legacyLessonId = parseInt(lessonId);
-    // Redirect legacy lesson URLs to proper category
-    return <Navigate to={`/category/${legacyLessonId}`} replace />;
-  }
+  const { categoryId } = useParams();
   
   const categoryIndex = parseInt(categoryId || "1") - 1;
 
@@ -492,10 +485,10 @@ export default function Category() {
     }
   ];
 
-  const category = categories[categoryIndex];
+  const category = categories.find(cat => cat.id === parseInt(categoryId || "1"));
 
   if (!category) {
-    return <Navigate to="/not-found" replace />;
+    return <Navigate to="/" replace />;
   }
 
   const IconComponent = category.icon;
