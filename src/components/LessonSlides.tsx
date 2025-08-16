@@ -4,13 +4,18 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Progress } from "@/components/ui/progress";
 import { Badge } from "@/components/ui/badge";
 import { InteractiveActivity } from "@/components/InteractiveActivity";
-import { ChevronLeft, ChevronRight, Trophy, Target, BookOpen } from "lucide-react";
+import { ChevronLeft, ChevronRight, Trophy, Target, BookOpen, Home } from "lucide-react";
+import { Link } from "react-router-dom";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 
 interface LessonSlidesProps {
-  lessonId: number;
+  lessonId: string;
   lessonData: any;
+  categoryTitle?: string;
+  categoryId?: number;
+  totalLessons?: number;
+  currentLessonIndex?: number;
 }
 
 interface Slide {
@@ -22,7 +27,7 @@ interface Slide {
   grade?: string;
 }
 
-export const LessonSlides = ({ lessonId, lessonData }: LessonSlidesProps) => {
+export const LessonSlides = ({ lessonId, lessonData, categoryTitle, categoryId, totalLessons, currentLessonIndex }: LessonSlidesProps) => {
   const [currentSlide, setCurrentSlide] = useState(0);
   const [completedActivities, setCompletedActivities] = useState<Record<number, any>>({});
   const [slides, setSlides] = useState<Slide[]>([]);
@@ -132,7 +137,7 @@ export const LessonSlides = ({ lessonId, lessonData }: LessonSlidesProps) => {
             </CardHeader>
             <CardContent>
               <InteractiveActivity 
-                lessonId={lessonId} 
+                lessonId={parseInt(lessonId.split('-')[0]) || 1} 
                 stepIndex={slide.activityIndex!}
                 onComplete={(result) => handleActivityComplete(slide.activityIndex!, result)}
               />
@@ -221,6 +226,22 @@ export const LessonSlides = ({ lessonId, lessonData }: LessonSlidesProps) => {
 
   return (
     <div className="max-w-4xl mx-auto space-y-6">
+      {/* Breadcrumb Navigation */}
+      {categoryTitle && categoryId && (
+        <div className="flex items-center gap-2 text-sm text-muted-foreground mb-4">
+          <Link to="/" className="hover:text-primary flex items-center gap-1">
+            <Home className="h-4 w-4" />
+            Home
+          </Link>
+          <ChevronRight className="h-4 w-4" />
+          <Link to={`/category/${categoryId}`} className="hover:text-primary">
+            {categoryTitle}
+          </Link>
+          <ChevronRight className="h-4 w-4" />
+          <span>Lesson {currentLessonIndex}</span>
+        </div>
+      )}
+
       {/* Progress Bar */}
       <div className="space-y-2">
         <div className="flex justify-between text-sm text-muted-foreground">
@@ -258,8 +279,17 @@ export const LessonSlides = ({ lessonId, lessonData }: LessonSlidesProps) => {
           disabled={currentSlide === slides.length - 1 || !canProceed()}
           className="flex items-center gap-2"
         >
-          Next
-          <ChevronRight className="h-4 w-4" />
+          {currentSlide === slides.length - 1 ? (
+            <>
+              Complete Lesson
+              <Trophy className="h-4 w-4" />
+            </>
+          ) : (
+            <>
+              Next
+              <ChevronRight className="h-4 w-4" />
+            </>
+          )}
         </Button>
       </div>
 

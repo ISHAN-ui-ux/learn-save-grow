@@ -1,16 +1,19 @@
 import { useParams, Navigate } from "react-router-dom";
 import { LessonSlides } from "@/components/LessonSlides";
-
 export default function Lesson() {
-  const { id } = useParams();
-  const lessonId = parseInt(id || "1");
-
-  // Comprehensive lesson data with expanded content and activities
-  const lessons = [
+  const { categoryId, lessonId } = useParams();
+  const categoryIndex = parseInt(categoryId || "1");
+  const lessonIndex = parseInt(lessonId || "1");
+  // Comprehensive lesson data organized by categories
+  const categories = [
     {
       id: 1,
-      title: "Introduction to Money",
-      content: `## What is Money?
+      title: "Financial Foundations",
+      lessons: [
+        {
+          id: 1,
+          title: "What is Money?",
+          content: `## What is Money?
 
 Money is one of humanity's most important inventions. At its core, money is anything that people agree to accept in exchange for goods and services. But money serves three crucial functions that make our modern economy possible.
 
@@ -64,100 +67,237 @@ Today's money system is more complex than ever. Most money exists as digital ent
 - The average American makes 50+ electronic payments per month
 - Mobile payments are growing 20%+ annually worldwide
 
-Understanding these fundamentals prepares you to make informed financial decisions and navigate our increasingly digital economy.
+Understanding these fundamentals prepares you to make informed financial decisions and navigate our increasingly digital economy.`,
+          activities: ["comprehensive_quiz", "written_analysis", "case_study"]
+        },
+        {
+          id: 2,
+          title: "Types of Money",
+          content: `## Types of Money
 
-## Security Features of Modern Currency
+Understanding different forms of money helps us navigate our modern financial system and make informed decisions about how we store, transfer, and use our wealth.
 
-Physical currency includes numerous security features to prevent counterfeiting:
-- **Watermarks**: Visible when held to light
-- **Security threads**: Embedded strips with microprinting
-- **Color-changing ink**: Shifts color when tilted
-- **Raised printing**: Textured feel of important elements
-- **Microprinting**: Tiny text difficult to reproduce
+### Physical Currency
 
-## The Psychology of Money
+**Coins and Bills**
+Physical currency remains important despite the digital revolution. The U.S. Mint produces billions of coins annually, while the Bureau of Engraving and Printing creates about 7.4 billion banknotes each year.
 
-Money isn't just an economic tool - it affects our psychology and behavior:
-- **Loss aversion**: People feel losses more strongly than equivalent gains
-- **Mental accounting**: We treat money differently based on its source
-- **Present bias**: We prefer immediate rewards over future benefits
-- **Social comparison**: Our spending is influenced by others' behavior
+**Security Features**
+Modern currency includes sophisticated anti-counterfeiting measures:
+- Watermarks visible when held to light
+- Color-changing ink that shifts when tilted
+- Security threads embedded in the paper
+- Microprinting too small to reproduce accurately
+- Raised printing with distinctive texture
 
-Understanding these psychological factors helps you make better financial decisions and avoid common money mistakes.`,
-      activities: [
-        "comprehensive_quiz",
-        "written_analysis", 
-        "case_study",
-        "interactive_timeline",
-        "inflation_calculator"
+**Global Perspective**
+Different countries have unique approaches to physical currency:
+- Canada eliminated the penny in 2013 due to production costs
+- Sweden is moving toward becoming cashless
+- Some countries use polymer (plastic) bills for durability
+- The Euro is used by 19 countries, demonstrating currency union
+
+### Digital Money
+
+**Electronic Payments**
+Digital transactions now dominate financial activity:
+- Credit and debit card networks process trillions of dollars annually
+- ACH (Automated Clearing House) handles direct deposits and bill payments
+- Wire transfers enable large, immediate transfers
+- Payment apps like Venmo and Cash App popularize peer-to-peer transfers
+
+**Mobile Payments**
+Smartphone-based payments are revolutionizing commerce:
+- NFC (Near Field Communication) enables tap-to-pay
+- QR codes provide another contactless option
+- Biometric authentication adds security layers
+- Integration with loyalty programs and receipts
+
+**Central Bank Digital Currencies (CBDCs)**
+Governments worldwide are exploring digital versions of their currencies:
+- China's digital yuan is already in limited circulation
+- The European Central Bank is developing a digital euro
+- The Federal Reserve is researching a digital dollar
+- CBDCs could provide more direct monetary policy tools
+
+### Cryptocurrency
+
+**Bitcoin and Beyond**
+Cryptocurrencies represent a paradigm shift in money:
+- Decentralized networks eliminate the need for central authorities
+- Blockchain technology provides transparent, immutable records
+- Limited supply creates scarcity similar to precious metals
+- Global accessibility transcends national boundaries
+
+**Practical Considerations**
+While innovative, cryptocurrencies face challenges:
+- High volatility makes them risky stores of value
+- Energy consumption for mining raises environmental concerns
+- Regulatory uncertainty affects adoption and stability
+- Technical complexity barriers limit mainstream use
+
+**Stablecoins**
+These attempt to combine crypto benefits with price stability:
+- Pegged to stable assets like the U.S. dollar
+- Used for international transfers and DeFi applications
+- Backed by reserves of traditional assets
+- Growing use in commerce and savings
+
+### The Future of Money
+
+**Emerging Trends**
+Several developments are shaping money's future:
+- Programmable money that executes automatically
+- Internet of Things (IoT) devices making autonomous payments
+- Artificial intelligence optimizing financial decisions
+- Quantum computing potentially disrupting current security
+
+**Implications for Personal Finance**
+Understanding these trends helps in financial planning:
+- Diversify across different money types
+- Stay informed about technological developments
+- Consider security and privacy implications
+- Adapt to changing payment preferences
+
+This evolution of money from physical to digital forms reflects humanity's ongoing quest for more efficient, secure, and convenient ways to store and transfer value.`,
+          activities: ["digital_money_explorer", "currency_security_lab", "payment_method_analyzer"]
+        }
+        // More lessons in Financial Foundations...
       ]
     },
     {
       id: 2,
-      title: "Income and Earning Money",
-      content: `## Understanding Income
+      title: "Smart Spending & Budgeting",
+      lessons: [
+        {
+          id: 1,
+          title: "Introduction to Budgeting",
+          content: `## Introduction to Budgeting
 
-Income is the money you receive on a regular basis from various sources. Understanding different types of income is crucial for financial planning and tax purposes.
+A budget is your financial roadmap - a plan that tells your money where to go instead of wondering where it went. Despite its importance, only about 32% of Americans maintain a household budget. Those who do budget are more likely to feel financially secure and achieve their goals.
 
-### Types of Income
+### Why Budgeting Matters
 
-**1. Earned Income**
-- **Definition**: Money received in exchange for work or services
-- **Examples**: Wages, salaries, tips, commissions, bonuses
-- **Tax implications**: Subject to payroll taxes and income taxes
-- **Characteristics**: Requires active participation and time investment
+**Financial Control**
+Budgeting provides visibility into your spending patterns and helps you:
+- Identify where your money actually goes
+- Spot opportunities to reduce unnecessary expenses
+- Ensure important financial goals are funded
+- Avoid overspending and debt accumulation
 
-**2. Passive Income**
-- **Definition**: Money earned with minimal ongoing effort
-- **Examples**: Rental income, dividends, royalties, business investments
-- **Benefits**: Can generate money while you sleep or vacation
-- **Requirements**: Usually requires initial capital investment or creative work
+**Stress Reduction**
+Financial uncertainty is a major source of stress. A budget provides:
+- Predictability in your financial life
+- Confidence in your ability to handle expenses
+- Peace of mind about your financial future
+- Reduced anxiety about money decisions
 
-**3. Portfolio Income**
-- **Definition**: Income from investments like stocks, bonds, and mutual funds
-- **Examples**: Capital gains, dividend payments, interest from bonds
-- **Risk factors**: Subject to market volatility
-- **Tax advantages**: Often taxed at lower capital gains rates
+**Goal Achievement**
+Budgets transform dreams into achievable plans:
+- Break large goals into manageable monthly amounts
+- Track progress toward important milestones
+- Adjust spending to accelerate goal achievement
+- Build wealth systematically over time
 
-## Career Development and Income Growth
+### Common Budgeting Misconceptions
 
-Your earning potential depends on various factors you can influence through strategic decisions.
+**"Budgets Are Too Restrictive"**
+Reality: Budgets actually provide more freedom by:
+- Ensuring you can afford the things you value most
+- Eliminating guilt about reasonable spending
+- Preventing financial crises that truly restrict choices
+- Creating margin for spontaneous purchases
 
-### Factors Affecting Income Potential
+**"I Don't Earn Enough to Budget"**
+Reality: Lower incomes make budgeting more important, not less:
+- Every dollar matters more when resources are limited
+- Budgeting helps stretch limited income further
+- Identifies opportunities to increase income
+- Prevents debt cycles that worsen financial situations
 
-**Education and Skills**
-- College graduates earn $1.2 million more over their lifetime than high school graduates
-- Specialized skills in technology, healthcare, and finance command premium salaries
-- Continuous learning and certification updates increase marketability
+**"Budgeting Takes Too Much Time"**
+Reality: Modern tools make budgeting efficient:
+- Apps can automate much of the tracking process
+- Simple budgeting methods require minimal time investment
+- The time saved avoiding financial problems exceeds budgeting time
+- Skills improve with practice, making the process faster
 
-**Industry Choice**
-- Technology, finance, and healthcare typically offer higher salaries
-- Geographic location significantly impacts compensation (Silicon Valley vs. rural areas)
-- Growth industries offer better advancement opportunities
+### The Psychology of Money
 
-**Experience and Performance**
-- Each year of relevant experience typically increases salary by 3-5%
-- High performers can earn 20-50% more than average employees
-- Leadership and management roles offer substantial pay increases`,
-      activities: [
-        "income_calculator",
-        "career_planning",
-        "gig_economy_explorer",
-        "tax_withholding_calculator"
+Understanding behavioral factors improves budgeting success:
+
+**Mental Accounting**
+People treat money differently based on its source:
+- Tax refunds often feel like "free money" for splurging
+- Windfall gains are spent more freely than earned income
+- Money from different accounts feels separate even when it's not
+- Understanding this helps create more effective budget categories
+
+**Present Bias**
+Humans naturally prioritize immediate rewards:
+- Future benefits feel less valuable than immediate pleasures
+- This makes saving and budgeting psychologically challenging
+- Automatic transfers help overcome this bias
+- Visual reminders of future goals increase motivation
+
+**Social Influence**
+Our spending is heavily influenced by others:
+- Social media showcases highlight reels, not full financial pictures
+- Peer pressure affects spending decisions at all income levels
+- Cultural attitudes toward money vary significantly
+- Building supportive financial communities helps maintain good habits
+
+### Building Your Financial Foundation
+
+Before creating specific budget categories, establish core principles:
+
+**Values-Based Spending**
+Align your budget with what matters most to you:
+- Identify your top 3-5 life priorities
+- Ensure your budget supports these priorities
+- Reduce spending on things that don't align with your values
+- This makes budgeting feel empowering rather than restrictive
+
+**Emergency Preparedness**
+Build resilience into your financial plan:
+- Start with a small emergency fund ($500-$1,000)
+- Work toward 3-6 months of expenses in savings
+- Consider potential financial disruptions in your situation
+- An emergency fund prevents budget derailment from unexpected expenses
+
+**Flexibility and Adaptation**
+Create budgets that work with real life:
+- Allow for reasonable lifestyle expenses
+- Build in buffer amounts for category overages
+- Review and adjust monthly based on actual spending
+- Change is normal - budgets should evolve with your life
+
+This foundation of understanding why budgets matter, how psychology affects spending, and what principles guide effective budgeting sets the stage for creating and maintaining a successful financial plan.`,
+          activities: ["budget_assessment", "spending_psychology_quiz", "values_alignment_exercise"]
+        }
+        // More lessons in Smart Spending & Budgeting...
       ]
     }
-    // Additional lessons would follow the same pattern...
+    // More categories...
   ];
 
-  const lesson = lessons.find(l => l.id === lessonId);
+  const category = categories.find(c => c.id === categoryIndex);
+  const lesson = category?.lessons.find(l => l.id === lessonIndex);
 
-  if (!lesson) {
+  if (!category || !lesson) {
     return <Navigate to="/not-found" replace />;
   }
 
   return (
     <div className="container mx-auto px-4 py-8">
-      <LessonSlides lessonId={lessonId} lessonData={lesson} />
+      <LessonSlides 
+        lessonId={`${categoryIndex}-${lessonIndex}`} 
+        lessonData={lesson} 
+        categoryTitle={category.title}
+        categoryId={categoryIndex}
+        totalLessons={category.lessons.length}
+        currentLessonIndex={lessonIndex}
+      />
     </div>
   );
 }
