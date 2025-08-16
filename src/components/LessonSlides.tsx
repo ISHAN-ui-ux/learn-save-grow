@@ -2,9 +2,7 @@ import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
-import { Badge } from "@/components/ui/badge";
-import { InteractiveActivity } from "@/components/InteractiveActivity";
-import { ChevronLeft, ChevronRight, Trophy, Target, BookOpen, Home } from "lucide-react";
+import { ChevronLeft, ChevronRight, BookOpen, Home, CheckCircle, Trophy, Target } from "lucide-react";
 import { Link } from "react-router-dom";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
@@ -19,205 +17,219 @@ interface LessonSlidesProps {
 }
 
 interface Slide {
-  type: 'content' | 'activity' | 'score';
+  type: 'content' | 'quiz';
   title: string;
   content?: string;
-  activityIndex?: number;
-  score?: number;
-  grade?: string;
+  quiz?: {
+    questions: Array<{
+      question: string;
+      options: string[];
+      correct: number;
+      explanation: string;
+    }>;
+  };
 }
 
 export const LessonSlides = ({ lessonId, lessonData, categoryTitle, categoryId, totalLessons, currentLessonIndex }: LessonSlidesProps) => {
   const [currentSlide, setCurrentSlide] = useState(0);
-  const [completedActivities, setCompletedActivities] = useState<Record<number, any>>({});
   const [slides, setSlides] = useState<Slide[]>([]);
+  const [quizAnswers, setQuizAnswers] = useState<Record<number, number>>({});
+  const [quizResults, setQuizResults] = useState<Record<number, boolean>>({});
+  const [showQuizResults, setShowQuizResults] = useState(false);
+  const [completedLessons, setCompletedLessons] = useState<Set<string>>(new Set());
 
   useEffect(() => {
-    // Generate slides structure alternating content and activities
+    // Load completed lessons from localStorage
+    const completed = localStorage.getItem('completedLessons');
+    if (completed) {
+      setCompletedLessons(new Set(JSON.parse(completed)));
+    }
+  }, []);
+
+  useEffect(() => {
+    // Generate slides structure from content sections and insert quizzes
     const generatedSlides: Slide[] = [];
     
     // Split lesson content into sections (assuming it's structured with headers)
     const contentSections = lessonData.content.split(/(?=##)/g).filter(section => section.trim());
     
     contentSections.forEach((section, index) => {
-      // Add content slide
+      // Extract title from the section header or use a default
+      const titleMatch = section.match(/^## (.+)/);
+      const title = titleMatch ? titleMatch[1] : `${lessonData.title} - Part ${index + 1}`;
+      
       generatedSlides.push({
         type: 'content',
-        title: `${lessonData.title} - Part ${index + 1}`,
+        title: title,
         content: section
       });
       
-      // Add activity slide if there's a corresponding activity
-      if (lessonData.activities && lessonData.activities[index]) {
-        generatedSlides.push({
-          type: 'activity',
-          title: `Interactive Activity ${index + 1}`,
-          activityIndex: index
-        });
-        
-        // Add score slide placeholder (will be shown after activity completion)
-        generatedSlides.push({
-          type: 'score',
-          title: `Activity ${index + 1} Results`,
-          activityIndex: index
-        });
+      // Insert quiz after slide 5 and slide 10
+      if ((index === 4 || index === 9) && lessonData.quizzes) {
+        const quiz = lessonData.quizzes.find((q: any) => q.position === index + 1);
+        if (quiz) {
+          generatedSlides.push({
+            type: 'quiz',
+            title: index === 4 ? 'Mid-Lesson Quiz (5 Questions)' : 'Final Quiz (10 Questions)',
+            quiz: {
+              questions: quiz.questions
+            }
+          });
+        }
       }
     });
     
     setSlides(generatedSlides);
   }, [lessonData]);
 
-  const handleActivityComplete = (activityIndex: number, result: any) => {
-    setCompletedActivities(prev => ({
-      ...prev,
-      [activityIndex]: result
-    }));
-  };
 
   const nextSlide = () => {
     if (currentSlide < slides.length - 1) {
       setCurrentSlide(currentSlide + 1);
+      // Reset quiz state when moving to a new slide
+      setQuizAnswers({});
+      setQuizResults({});
+      setShowQuizResults(false);
     }
   };
 
   const prevSlide = () => {
     if (currentSlide > 0) {
       setCurrentSlide(currentSlide - 1);
+      // Reset quiz state when moving to a previous slide
+      setQuizAnswers({});
+      setQuizResults({});
+      setShowQuizResults(false);
     }
   };
 
-  const canProceed = () => {
-    const slide = slides[currentSlide];
-    if (slide?.type === 'activity') {
-      return completedActivities[slide.activityIndex!] !== undefined;
-    }
-    return true;
-  };
 
   const getProgressPercentage = () => {
     return ((currentSlide + 1) / slides.length) * 100;
+  };
+
+  const handleQuizSubmit = () => {
+    const slide = slides[currentSlide];
+    if (slide.type !== 'quiz' || !slide.quiz) return;
+
+    const results: Record<number, boolean> = {};
+    slide.quiz.questions.forEach((question, index) => {
+      results[index] = quizAnswers[index] === question.correct;
+    });
+    
+    setQuizResults(results);
+    setShowQuizResults(true);
+  };
+
+  const handleLessonComplete = () => {
+    const lessonKey = `${categoryId}-${lessonId}`;
+    const newCompleted = new Set(completedLessons);
+    newCompleted.add(lessonKey);
+    setCompletedLessons(newCompleted);
+    localStorage.setItem('completedLessons', JSON.stringify(Array.from(newCompleted)));
+  };
+
+  const canProceedFromQuiz = () => {
+    const slide = slides[currentSlide];
+    if (slide.type !== 'quiz') return true;
+    return showQuizResults;
   };
 
   const renderSlide = () => {
     const slide = slides[currentSlide];
     if (!slide) return null;
 
-    switch (slide.type) {
-      case 'content':
-        return (
-          <Card className="min-h-[500px]">
-            <CardHeader>
-              <div className="flex items-center gap-2">
-                <BookOpen className="h-5 w-5 text-primary" />
-                <CardTitle>{slide.title}</CardTitle>
-              </div>
-              <CardDescription>
-                Lesson {lessonId} - Slide {currentSlide + 1} of {slides.length}
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="prose prose-sm max-w-none">
-              <ReactMarkdown remarkPlugins={[remarkGfm]}>
-                {slide.content || ''}
-              </ReactMarkdown>
-            </CardContent>
-          </Card>
-        );
-
-      case 'activity':
-        return (
-          <Card className="min-h-[500px]">
-            <CardHeader>
-              <div className="flex items-center gap-2">
-                <Target className="h-5 w-5 text-primary" />
-                <CardTitle>{slide.title}</CardTitle>
-              </div>
-              <CardDescription>
-                Complete this activity to continue to the next section
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <InteractiveActivity 
-                lessonId={parseInt(lessonId.split('-')[0]) || 1} 
-                stepIndex={slide.activityIndex!}
-                onComplete={(result) => handleActivityComplete(slide.activityIndex!, result)}
-              />
-            </CardContent>
-          </Card>
-        );
-
-      case 'score':
-        const result = completedActivities[slide.activityIndex!];
-        if (!result) {
-          // If no result yet, show activity first
-          setCurrentSlide(currentSlide - 1);
-          return null;
-        }
-        
-        return (
-          <Card className="min-h-[500px]">
-            <CardHeader>
-              <div className="flex items-center gap-2">
-                <Trophy className="h-5 w-5 text-primary" />
-                <CardTitle>{slide.title}</CardTitle>
-              </div>
-              <CardDescription>
-                Great job! Here's how you performed
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-6">
-              <div className="text-center">
-                <div className="text-6xl font-bold text-primary mb-2">
-                  {result.score || 'N/A'}
-                  {result.score && '/100'}
+    if (slide.type === 'quiz') {
+      return (
+        <Card className="min-h-[500px]">
+          <CardHeader>
+            <div className="flex items-center gap-2">
+              <Target className="h-5 w-5 text-primary" />
+              <CardTitle>{slide.title}</CardTitle>
+            </div>
+            <CardDescription>
+              Answer all questions to see your results and continue
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-6">
+            {slide.quiz?.questions.map((question, qIndex) => (
+              <div key={qIndex} className="space-y-3">
+                <h4 className="font-medium text-lg">{qIndex + 1}. {question.question}</h4>
+                <div className="space-y-2">
+                  {question.options.map((option, oIndex) => (
+                    <label key={oIndex} className="flex items-center space-x-3 cursor-pointer">
+                      <input
+                        type="radio"
+                        name={`question-${qIndex}`}
+                        value={oIndex}
+                        checked={quizAnswers[qIndex] === oIndex}
+                        onChange={() => setQuizAnswers({...quizAnswers, [qIndex]: oIndex})}
+                        className="text-primary"
+                      />
+                      <span className={`${showQuizResults ? (
+                        oIndex === question.correct ? 'text-green-600 font-medium' : 
+                        quizAnswers[qIndex] === oIndex ? 'text-red-600' : ''
+                      ) : ''}`}>
+                        {option}
+                      </span>
+                      {showQuizResults && oIndex === question.correct && (
+                        <CheckCircle className="h-4 w-4 text-green-600" />
+                      )}
+                    </label>
+                  ))}
                 </div>
-                {result.grade && (
-                  <Badge variant="secondary" className="text-lg px-4 py-2">
-                    Grade: {result.grade}
-                  </Badge>
+                {showQuizResults && (
+                  <div className="mt-2 p-3 bg-muted rounded-lg">
+                    <p className="text-sm text-muted-foreground">
+                      <strong>Explanation:</strong> {question.explanation}
+                    </p>
+                  </div>
                 )}
               </div>
-              
-              {result.feedback && (
-                <div className="bg-primary/10 rounded-lg p-4">
-                  <h4 className="font-semibold mb-2">Feedback:</h4>
-                  <p className="text-sm">{result.feedback}</p>
-                </div>
-              )}
-              
-              {result.strengths && result.strengths.length > 0 && (
-                <div>
-                  <h4 className="font-semibold mb-2 text-green-600">Strengths:</h4>
-                  <ul className="list-disc list-inside text-sm space-y-1">
-                    {result.strengths.map((strength: string, i: number) => (
-                      <li key={i}>{strength}</li>
-                    ))}
-                  </ul>
-                </div>
-              )}
-              
-              {result.improvements && result.improvements.length > 0 && (
-                <div>
-                  <h4 className="font-semibold mb-2 text-blue-600">Areas for Improvement:</h4>
-                  <ul className="list-disc list-inside text-sm space-y-1">
-                    {result.improvements.map((improvement: string, i: number) => (
-                      <li key={i}>{improvement}</li>
-                    ))}
-                  </ul>
-                </div>
-              )}
-              
-              <div className="text-center pt-4">
+            ))}
+            
+            {!showQuizResults && (
+              <Button 
+                onClick={handleQuizSubmit}
+                disabled={!slide.quiz?.questions.every((_, index) => quizAnswers[index] !== undefined)}
+                className="w-full"
+              >
+                Submit Quiz
+              </Button>
+            )}
+            
+            {showQuizResults && (
+              <div className="text-center p-4 bg-primary/10 rounded-lg">
+                <Trophy className="h-8 w-8 text-primary mx-auto mb-2" />
+                <h3 className="text-lg font-semibold">Quiz Complete!</h3>
                 <p className="text-sm text-muted-foreground">
-                  Ready to continue? Click "Next" to proceed to the next section.
+                  You got {Object.values(quizResults).filter(Boolean).length} out of {slide.quiz?.questions.length} correct
                 </p>
               </div>
-            </CardContent>
-          </Card>
-        );
-
-      default:
-        return null;
+            )}
+          </CardContent>
+        </Card>
+      );
     }
+
+    return (
+      <Card className="min-h-[500px]">
+        <CardHeader>
+          <div className="flex items-center gap-2">
+            <BookOpen className="h-5 w-5 text-primary" />
+            <CardTitle>{slide.title}</CardTitle>
+          </div>
+          <CardDescription>
+            Slide {currentSlide + 1} of {slides.length}
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="prose prose-sm max-w-none">
+          <ReactMarkdown remarkPlugins={[remarkGfm]}>
+            {slide.content || ''}
+          </ReactMarkdown>
+        </CardContent>
+      </Card>
+    );
   };
 
   if (slides.length === 0) {
@@ -269,28 +281,28 @@ export const LessonSlides = ({ lessonId, lessonData, categoryTitle, categoryId, 
         </Button>
 
         <div className="flex items-center gap-2">
-          {slides[currentSlide]?.type === 'activity' && !canProceed() && (
-            <Badge variant="secondary">Complete activity to continue</Badge>
-          )}
         </div>
 
-        <Button 
-          onClick={nextSlide}
-          disabled={currentSlide === slides.length - 1 || !canProceed()}
-          className="flex items-center gap-2"
-        >
-          {currentSlide === slides.length - 1 ? (
-            <>
-              Complete Lesson
-              <Trophy className="h-4 w-4" />
-            </>
-          ) : (
-            <>
-              Next
-              <ChevronRight className="h-4 w-4" />
-            </>
-          )}
-        </Button>
+        {currentSlide === slides.length - 1 ? (
+          <Link to="/">
+            <Button 
+              onClick={handleLessonComplete}
+              className="flex items-center gap-2"
+            >
+              Complete Lesson & Return Home
+              <CheckCircle className="h-4 w-4" />
+            </Button>
+          </Link>
+        ) : (
+          <Button 
+            onClick={nextSlide}
+            disabled={!canProceedFromQuiz()}
+            className="flex items-center gap-2"
+          >
+            Next
+            <ChevronRight className="h-4 w-4" />
+          </Button>
+        )}
       </div>
 
       {/* Slide indicator dots */}

@@ -1,3 +1,4 @@
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -31,60 +32,42 @@ import {
 } from "lucide-react";
 
 const LearningSection = () => {
+  const [completedLessons, setCompletedLessons] = useState<Set<string>>(new Set());
+
+  useEffect(() => {
+    // Load completed lessons from localStorage
+    const completed = localStorage.getItem('completedLessons');
+    if (completed) {
+      setCompletedLessons(new Set(JSON.parse(completed)));
+    }
+  }, []);
   const learningPaths = [
     {
-      title: "Financial Foundations",
-      description: "Master the basics of money management for all ages",
+      title: "Foundations of Financial Literacy",
+      description: "Master the fundamentals of handling money wisely and building financial confidence",
       icon: Coins,
-      lessons: 8,
-      duration: "2-3 weeks",
+      slides: 10,
+      duration: "30-40 mins",
       difficulty: "Beginner",
-      topics: ["What is Money?", "Earning & Spending", "Basic Budgeting", "Saving Fundamentals"]
+      topics: ["Financial Literacy Basics", "Budgeting Fundamentals", "Credit Management", "Investment Introduction"]
     },
     {
-      title: "Smart Spending & Budgeting",
-      description: "Learn to make informed spending decisions and create budgets",
-      icon: Calculator,
-      lessons: 12,
-      duration: "3-4 weeks", 
-      difficulty: "Beginner",
-      topics: ["Budget Categories", "Needs vs Wants", "Comparison Shopping", "Tracking Expenses"]
-    },
-    {
-      title: "Saving & Goal Setting",
-      description: "Build emergency funds and work toward financial goals",
-      icon: Target,
-      lessons: 10,
-      duration: "4-5 weeks",
-      difficulty: "Intermediate",
-      topics: ["Emergency Funds", "Short-term Goals", "Long-term Planning", "Compound Interest"]
-    },
-    {
-      title: "Credit & Banking",
-      description: "Understand credit scores, loans, and banking services",
-      icon: CreditCard,
-      lessons: 15,
-      duration: "5-6 weeks",
-      difficulty: "Intermediate",
-      topics: ["Banking Basics", "Credit Scores", "Loans & Interest", "Building Credit"]
-    },
-    {
-      title: "Investing & Wealth Building",
-      description: "Start investing and building long-term wealth",
+      title: "Building Wealth and Budgeting", 
+      description: "Advanced strategies for wealth building through strategic budgeting and investing",
       icon: TrendingUp,
-      lessons: 18,
-      duration: "6-8 weeks",
-      difficulty: "Advanced",
-      topics: ["Stock Market Basics", "Retirement Accounts", "Portfolio Diversification", "Risk Management"]
+      slides: 10,
+      duration: "35-45 mins",
+      difficulty: "Intermediate", 
+      topics: ["Advanced Budgeting", "Investment Accounts", "Asset Allocation", "Multiple Income Streams"]
     },
     {
-      title: "Advanced Financial Planning",
-      description: "Master comprehensive financial planning strategies",
+      title: "Investing and Advanced Financial Planning",
+      description: "Sophisticated investment strategies and comprehensive financial planning",
       icon: Shield,
-      lessons: 20,
-      duration: "8-10 weeks",
+      slides: 10,
+      duration: "40-50 mins",
       difficulty: "Advanced",
-      topics: ["Tax Planning", "Insurance", "Estate Planning", "Business Finance"]
+      topics: ["Investment Strategies", "Risk Management", "Retirement Planning", "Estate Planning"]
     }
   ];
 
@@ -120,51 +103,62 @@ const LearningSection = () => {
 
           <TabsContent value="courses" className="space-y-8">
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {learningPaths.map((path, index) => (
-                <Card key={index} className="hover:shadow-lg transition-all duration-300 group">
-                  <CardHeader>
-                    <div className="flex items-center gap-3 mb-2">
-                      <div className="w-12 h-12 bg-gradient-primary rounded-lg flex items-center justify-center">
-                        <path.icon className="h-6 w-6 text-white" />
+              {learningPaths.map((path, index) => {
+                const lessonKey = `${index + 1}-1`;
+                const isCompleted = completedLessons.has(lessonKey);
+                
+                return (
+                  <Card key={index} className="hover:shadow-lg transition-all duration-300 group">
+                    <CardHeader>
+                      <div className="flex items-center gap-3 mb-2">
+                        <div className="w-12 h-12 bg-gradient-primary rounded-lg flex items-center justify-center">
+                          <path.icon className="h-6 w-6 text-white" />
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <Badge variant={path.difficulty === "Beginner" ? "default" : path.difficulty === "Intermediate" ? "secondary" : "destructive"}>
+                            {path.difficulty}
+                          </Badge>
+                          {isCompleted && (
+                            <Badge variant="outline" className="text-green-600 border-green-600">
+                              <CheckCircle className="h-3 w-3 mr-1" />
+                              Completed
+                            </Badge>
+                          )}
+                        </div>
                       </div>
-                      <div>
-                        <Badge variant={path.difficulty === "Beginner" ? "default" : path.difficulty === "Intermediate" ? "secondary" : "destructive"}>
-                          {path.difficulty}
-                        </Badge>
-                      </div>
-                    </div>
-                    <CardTitle className="group-hover:text-primary transition-colors">{path.title}</CardTitle>
-                    <CardDescription>{path.description}</CardDescription>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="space-y-4">
-                      <div className="flex justify-between text-sm text-muted-foreground">
-                        <span>{path.lessons} lessons</span>
-                        <span>{path.duration}</span>
-                      </div>
-                      
-                      <div className="space-y-2">
-                        <p className="text-sm font-medium">What you'll learn:</p>
-                        <ul className="text-sm text-muted-foreground space-y-1">
-                          {path.topics.map((topic, i) => (
-                            <li key={i} className="flex items-center gap-2">
-                              <CheckCircle className="h-3 w-3 text-green-500" />
-                              {topic}
-                            </li>
-                          ))}
-                        </ul>
-                      </div>
+                      <CardTitle className="group-hover:text-primary transition-colors">{path.title}</CardTitle>
+                      <CardDescription>{path.description}</CardDescription>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="space-y-4">
+                        <div className="flex justify-between text-sm text-muted-foreground">
+                          <span>{path.slides} slides</span>
+                          <span>{path.duration}</span>
+                        </div>
+                        
+                        <div className="space-y-2">
+                          <p className="text-sm font-medium">What you'll learn:</p>
+                          <ul className="text-sm text-muted-foreground space-y-1">
+                            {path.topics.map((topic, i) => (
+                              <li key={i} className="flex items-center gap-2">
+                                <CheckCircle className="h-3 w-3 text-green-500" />
+                                {topic}
+                              </li>
+                            ))}
+                          </ul>
+                        </div>
 
-                      <Button className="w-full group-hover:bg-primary group-hover:text-primary-foreground" asChild>
-                        <Link to={`/lesson/${index + 1}/1`}>
-                          Start Slideshow
-                          <Play className="ml-2 h-4 w-4" />
-                        </Link>
-                      </Button>
-                    </div>
-                  </CardContent>
-                </Card>
-              ))}
+                        <Button className="w-full group-hover:bg-primary group-hover:text-primary-foreground" asChild>
+                          <Link to={`/lesson/${index + 1}/1`}>
+                            {isCompleted ? 'Review Lesson' : 'Start Lesson'}
+                            <Play className="ml-2 h-4 w-4" />
+                          </Link>
+                        </Button>
+                      </div>
+                    </CardContent>
+                  </Card>
+                );
+              })}
             </div>
           </TabsContent>
 
