@@ -9,6 +9,30 @@ import { useToast } from "@/components/ui/use-toast";
 const BlogPost = () => {
   const { id } = useParams();
   const { toast } = useToast();
+  
+  // Different layout styles for variety
+  const getLayoutStyle = (postId: string) => {
+    const layouts = {
+      '1': 'classic',
+      '2': 'magazine',
+      '3': 'modern',
+    };
+    return layouts[postId as keyof typeof layouts] || 'classic';
+  };
+  
+  const getCategoryColor = (category: string) => {
+    const colors: Record<string, string> = {
+      'Kids Finance': 'bg-kids-primary',
+      'Psychology': 'bg-secondary',
+      'Cryptocurrency': 'bg-electric-cyan',
+      'Adult Finance': 'bg-trust-blue',
+      'Investing': 'bg-growth-green',
+      'Budgeting': 'bg-vibrant-orange',
+    };
+    return colors[category] || 'bg-primary';
+  };
+  
+  const layoutStyle = id ? getLayoutStyle(id) : 'classic';
 
   const blogPosts = {
     "1": {
@@ -1449,87 +1473,219 @@ const BlogPost = () => {
       <Navigation />
       
       <article className="pt-24 pb-12">
-        <div className="container mx-auto px-4 max-w-4xl">
-          {/* Back button */}
-          <Link to="/blog" className="inline-flex items-center text-muted-foreground hover:text-foreground mb-8">
-            <ArrowLeft className="mr-2 h-4 w-4" />
-            Back to Blog
-          </Link>
+        {/* Classic Layout */}
+        {layoutStyle === 'classic' && (
+          <div className="container mx-auto px-4 max-w-4xl">
+            <Link to="/blog" className="inline-flex items-center text-muted-foreground hover:text-foreground mb-8 font-medium transition-colors">
+              <ArrowLeft className="mr-2 h-4 w-4" />
+              Back to Blog
+            </Link>
 
-          {/* Article header */}
-          <header className="mb-8">
-            <Badge variant="secondary" className="mb-4">
-              {post.category}
-            </Badge>
-            <h1 className="text-4xl md:text-5xl font-bold text-foreground mb-6 leading-tight">
-              {post.title}
-            </h1>
-            
-            {/* Author and metadata */}
-            <div className="flex flex-wrap items-center gap-6 text-muted-foreground mb-8">
-              <div className="flex items-center gap-2">
-                <User className="h-4 w-4" />
-                <span className="font-medium">{post.author}</span>
+            <header className="mb-8">
+              <Badge className={`mb-4 ${getCategoryColor(post.category)} text-white`}>
+                {post.category}
+              </Badge>
+              <h1 className="text-4xl md:text-6xl font-display font-bold text-foreground mb-6 leading-tight">
+                {post.title}
+              </h1>
+              
+              <div className="flex flex-wrap items-center gap-6 text-muted-foreground mb-8">
+                <div className="flex items-center gap-2">
+                  <User className="h-4 w-4" />
+                  <span className="font-medium">{post.author}</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <Calendar className="h-4 w-4" />
+                  <span>{post.date}</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <Clock className="h-4 w-4" />
+                  <span>{post.readTime}</span>
+                </div>
               </div>
-              <div className="flex items-center gap-2">
-                <Calendar className="h-4 w-4" />
-                <span>{post.date}</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <Clock className="h-4 w-4" />
-                <span>{post.readTime}</span>
-              </div>
-            </div>
 
-            {/* Action buttons */}
-            <div className="flex gap-3 mb-8">
-              <Button variant="outline" size="sm" onClick={handleShare}>
-                <Share2 className="mr-2 h-4 w-4" />
-                Share
-              </Button>
-              <Button variant="outline" size="sm">
-                <BookmarkPlus className="mr-2 h-4 w-4" />
-                Save
-              </Button>
-            </div>
-          </header>
-
-          {/* Featured image */}
-          <div className="mb-8">
-            <img 
-              src={post.image} 
-              alt={post.title}
-              className="w-full h-64 md:h-96 object-cover rounded-lg shadow-lg"
-            />
-          </div>
-
-          {/* Article content */}
-          <div 
-            className="prose prose-lg max-w-none prose-headings:text-foreground prose-p:text-muted-foreground prose-strong:text-foreground prose-ul:text-muted-foreground prose-ol:text-muted-foreground prose-blockquote:border-primary prose-blockquote:bg-muted/50 prose-blockquote:p-4 prose-blockquote:rounded-lg prose-lead:text-xl prose-lead:font-medium prose-lead:text-foreground"
-            dangerouslySetInnerHTML={{ __html: post.content }}
-          />
-
-          {/* Article footer */}
-          <footer className="mt-12 pt-8 border-t border-border">
-            <div className="flex justify-between items-center">
-              <div className="flex items-center gap-3">
+              <div className="flex gap-3 mb-8">
                 <Button variant="outline" size="sm" onClick={handleShare}>
                   <Share2 className="mr-2 h-4 w-4" />
-                  Share Article
+                  Share
                 </Button>
                 <Button variant="outline" size="sm">
                   <BookmarkPlus className="mr-2 h-4 w-4" />
-                  Save for Later
+                  Save
                 </Button>
               </div>
-              <Link to="/blog">
-                <Button variant="default">
-                  Read More Articles
-                </Button>
-              </Link>
+            </header>
+
+            <div className="mb-8 rounded-2xl overflow-hidden">
+              <img 
+                src={post.image} 
+                alt={post.title}
+                className="w-full h-64 md:h-96 object-cover"
+              />
             </div>
-          </footer>
-        </div>
+
+            <div 
+              className="prose prose-lg max-w-none prose-headings:font-display prose-headings:text-foreground prose-p:text-muted-foreground prose-strong:text-foreground prose-ul:text-muted-foreground prose-ol:text-muted-foreground prose-blockquote:border-primary prose-blockquote:bg-muted/50 prose-blockquote:p-6 prose-blockquote:rounded-xl prose-lead:text-xl prose-lead:font-medium prose-lead:text-foreground"
+              dangerouslySetInnerHTML={{ __html: post.content }}
+            />
+
+            <footer className="mt-12 pt-8 border-t border-border">
+              <div className="flex justify-between items-center">
+                <div className="flex items-center gap-3">
+                  <Button variant="outline" size="sm" onClick={handleShare}>
+                    <Share2 className="mr-2 h-4 w-4" />
+                    Share this article
+                  </Button>
+                </div>
+                <Badge className={`${getCategoryColor(post.category)} text-white`}>
+                  {post.category}
+                </Badge>
+              </div>
+            </footer>
+          </div>
+        )}
+
+        {/* Magazine Layout */}
+        {layoutStyle === 'magazine' && (
+          <div className="container mx-auto px-4 max-w-6xl">
+            <Link to="/blog" className="inline-flex items-center text-muted-foreground hover:text-foreground mb-8 font-medium transition-colors">
+              <ArrowLeft className="mr-2 h-4 w-4" />
+              Back to Blog
+            </Link>
+
+            <div className="grid lg:grid-cols-12 gap-8">
+              <div className="lg:col-span-8">
+                <header className="mb-8">
+                  <div className="flex items-center gap-4 mb-6">
+                    <Badge className={`${getCategoryColor(post.category)} text-white px-4 py-2 text-sm`}>
+                      {post.category}
+                    </Badge>
+                    <span className="text-muted-foreground">{post.readTime}</span>
+                  </div>
+                  <h1 className="text-5xl md:text-7xl font-display font-extrabold text-foreground mb-8 leading-none">
+                    {post.title}
+                  </h1>
+                </header>
+
+                <div className="mb-12 rounded-3xl overflow-hidden shadow-2xl">
+                  <img 
+                    src={post.image} 
+                    alt={post.title}
+                    className="w-full h-80 md:h-[500px] object-cover"
+                  />
+                </div>
+
+                <div 
+                  className="prose prose-xl max-w-none prose-headings:font-display prose-headings:text-foreground prose-p:text-muted-foreground prose-strong:text-foreground prose-ul:text-muted-foreground prose-ol:text-muted-foreground prose-blockquote:border-l-8 prose-blockquote:border-secondary prose-blockquote:bg-muted/30 prose-blockquote:p-8 prose-blockquote:rounded-2xl prose-lead:text-2xl prose-lead:font-semibold prose-lead:text-foreground"
+                  dangerouslySetInnerHTML={{ __html: post.content }}
+                />
+              </div>
+
+              <aside className="lg:col-span-4 space-y-6">
+                <div className="sticky top-24 space-y-6">
+                  <div className="bg-gradient-secondary text-white p-6 rounded-2xl">
+                    <h3 className="font-display font-bold text-xl mb-4">About the Author</h3>
+                    <div className="flex items-center gap-3 mb-4">
+                      <User className="h-6 w-6" />
+                      <span className="font-semibold text-lg">{post.author}</span>
+                    </div>
+                    <div className="flex items-center gap-3 text-white/90">
+                      <Calendar className="h-4 w-4" />
+                      <span>{post.date}</span>
+                    </div>
+                  </div>
+
+                  <div className="bg-muted/50 p-6 rounded-2xl border border-border">
+                    <h3 className="font-display font-bold text-lg mb-4">Actions</h3>
+                    <div className="space-y-3">
+                      <Button className="w-full" variant="outline" size="sm" onClick={handleShare}>
+                        <Share2 className="mr-2 h-4 w-4" />
+                        Share Article
+                      </Button>
+                      <Button className="w-full" variant="outline" size="sm">
+                        <BookmarkPlus className="mr-2 h-4 w-4" />
+                        Save for Later
+                      </Button>
+                    </div>
+                  </div>
+                </div>
+              </aside>
+            </div>
+          </div>
+        )}
+
+        {/* Modern Layout */}
+        {layoutStyle === 'modern' && (
+          <div className="container mx-auto px-4 max-w-5xl">
+            <Link to="/blog" className="inline-flex items-center text-muted-foreground hover:text-foreground mb-8 font-medium transition-colors">
+              <ArrowLeft className="mr-2 h-4 w-4" />
+              Back to Blog
+            </Link>
+
+            <header className={`bg-gradient-vibrant text-white p-8 md:p-12 rounded-3xl mb-12 shadow-2xl`}>
+              <Badge variant="secondary" className="bg-white/20 text-white border-white/30 mb-6 backdrop-blur-sm">
+                {post.category}
+              </Badge>
+              <h1 className="text-5xl md:text-7xl font-display font-black mb-8 leading-tight">
+                {post.title}
+              </h1>
+              
+              <div className="flex flex-wrap items-center gap-6 text-white/90 mb-8">
+                <div className="flex items-center gap-2 bg-white/10 px-4 py-2 rounded-full backdrop-blur-sm">
+                  <User className="h-5 w-5" />
+                  <span className="font-semibold">{post.author}</span>
+                </div>
+                <div className="flex items-center gap-2 bg-white/10 px-4 py-2 rounded-full backdrop-blur-sm">
+                  <Calendar className="h-5 w-5" />
+                  <span>{post.date}</span>
+                </div>
+                <div className="flex items-center gap-2 bg-white/10 px-4 py-2 rounded-full backdrop-blur-sm">
+                  <Clock className="h-5 w-5" />
+                  <span>{post.readTime}</span>
+                </div>
+              </div>
+
+              <div className="flex gap-3">
+                <Button variant="secondary" size="lg" onClick={handleShare} className="bg-white text-primary hover:bg-white/90 font-semibold">
+                  <Share2 className="mr-2 h-5 w-5" />
+                  Share
+                </Button>
+                <Button variant="secondary" size="lg" className="bg-white/20 text-white hover:bg-white/30 backdrop-blur-sm font-semibold border-white/30">
+                  <BookmarkPlus className="mr-2 h-5 w-5" />
+                  Save
+                </Button>
+              </div>
+            </header>
+
+            <div className="mb-12 rounded-3xl overflow-hidden shadow-2xl transform hover:scale-[1.02] transition-transform duration-300">
+              <img 
+                src={post.image} 
+                alt={post.title}
+                className="w-full h-72 md:h-[600px] object-cover"
+              />
+            </div>
+
+            <div 
+              className="prose prose-xl max-w-none prose-headings:font-display prose-headings:text-foreground prose-h2:text-4xl prose-h3:text-3xl prose-p:text-muted-foreground prose-p:text-lg prose-strong:text-foreground prose-ul:text-muted-foreground prose-ol:text-muted-foreground prose-blockquote:border-l-8 prose-blockquote:border-primary prose-blockquote:bg-gradient-subtle prose-blockquote:p-8 prose-blockquote:rounded-2xl prose-blockquote:shadow-lg prose-lead:text-3xl prose-lead:font-bold prose-lead:text-foreground"
+              dangerouslySetInnerHTML={{ __html: post.content }}
+            />
+
+            <footer className="mt-16 p-8 bg-gradient-primary text-white rounded-3xl shadow-xl">
+              <div className="flex flex-col md:flex-row justify-between items-center gap-6">
+                <div>
+                  <p className="text-sm opacity-90 mb-2">Found this helpful?</p>
+                  <Button variant="secondary" size="lg" onClick={handleShare} className="bg-white text-primary hover:bg-white/90 font-semibold">
+                    <Share2 className="mr-2 h-5 w-5" />
+                    Share with others
+                  </Button>
+                </div>
+                <Badge className="bg-white/20 text-white border-white/30 text-lg px-6 py-3 backdrop-blur-sm">
+                  {post.category}
+                </Badge>
+              </div>
+            </footer>
+          </div>
+        )}
       </article>
 
       <Footer />
