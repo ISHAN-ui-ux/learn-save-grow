@@ -28,6 +28,7 @@ import {
 import { Link } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
 import { PieChart as RechartsPieChart, Cell, ResponsiveContainer, Tooltip, Legend, Pie } from "recharts";
+import dollarBill from "@/assets/dollar-bill.png";
 
 type InvestmentType = "savings" | "cd" | "index" | "stock" | "bonds" | "commodity";
 
