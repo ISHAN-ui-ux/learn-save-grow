@@ -18,6 +18,10 @@ export default {
 			}
 		},
 		extend: {
+			fontFamily: {
+				sans: ['Space Grotesk', 'system-ui', 'sans-serif'],
+				display: ['Sora', 'system-ui', 'sans-serif'],
+			},
 			colors: {
 				border: 'hsl(var(--border))',
 				input: 'hsl(var(--input))',
@@ -59,6 +63,8 @@ export default {
 				},
 				'trust-blue': 'hsl(var(--trust-blue))',
 				'growth-green': 'hsl(var(--growth-green))',
+				'vibrant-orange': 'hsl(var(--vibrant-orange))',
+				'electric-cyan': 'hsl(var(--electric-cyan))',
 				sidebar: {
 					DEFAULT: 'hsl(var(--sidebar-background))',
 					foreground: 'hsl(var(--sidebar-foreground))',
@@ -109,9 +115,11 @@ export default {
 			},
 			backgroundImage: {
 				'gradient-primary': 'var(--gradient-primary)',
+				'gradient-secondary': 'var(--gradient-secondary)',
 				'gradient-kids': 'var(--gradient-kids)',
 				'gradient-trust': 'var(--gradient-trust)',
-				'gradient-subtle': 'var(--gradient-subtle)'
+				'gradient-subtle': 'var(--gradient-subtle)',
+				'gradient-vibrant': 'var(--gradient-vibrant)'
 			}
 		}
 	},
