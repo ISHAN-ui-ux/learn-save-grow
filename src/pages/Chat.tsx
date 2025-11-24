@@ -71,21 +71,28 @@ const Chat = () => {
       });
 
       if (error) {
+        console.error("Edge function error:", error);
         throw new Error(error.message || "Failed to get response");
+      }
+
+      if (data?.error) {
+        console.error("API error:", data.error);
+        throw new Error(data.error);
       }
       
       const assistantMessage: Message = {
         id: (Date.now() + 1).toString(),
-        content: data.response,
+        content: data?.response || "Sorry, I couldn't generate a response.",
         role: "assistant",
         timestamp: new Date(),
       };
 
       setMessages(prev => [...prev, assistantMessage]);
     } catch (error) {
+      console.error("Chat error:", error);
       toast({
         title: "Error",
-        description: "Failed to get response. Please try again.",
+        description: error instanceof Error ? error.message : "Failed to get response. Please try again.",
         variant: "destructive",
       });
     } finally {
