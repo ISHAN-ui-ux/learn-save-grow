@@ -636,6 +636,10 @@ const StackYourFuture = () => {
   const advanceTime = () => {
     if (currentYear >= 20) return;
     
+    // Update investment profits every period
+    updateInvestmentProfits();
+    updateStockPrices();
+    
     if (currentPeriod === 1) {
       setCurrentPeriod(2);
       setPocketCash(prev => prev + 1000);
@@ -647,8 +651,6 @@ const StackYourFuture = () => {
       setCurrentPeriod(1);
       setCurrentYear(prev => prev + 1);
       setPocketCash(prev => prev + 5000); // $5000 per year completion
-      updateInvestmentProfits();
-      updateStockPrices();
       toast({
         title: "📅 New Year Started",
         description: `Welcome to Year ${currentYear + 1}! You received $5,000 for completing the year.`
