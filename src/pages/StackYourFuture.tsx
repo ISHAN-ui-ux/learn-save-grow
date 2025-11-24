@@ -913,12 +913,30 @@ const StackYourFuture = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-900 via-blue-900 to-indigo-900 p-4">
-      <div className="max-w-7xl mx-auto">
+    <div className="min-h-screen bg-gradient-to-br from-[hsl(45,35%,95%)] via-[hsl(150,20%,88%)] to-[hsl(35,30%,85%)] p-4 relative overflow-hidden">
+      {/* Dollar Bill Watermark Background */}
+      <div 
+        className="fixed inset-0 opacity-[0.08] pointer-events-none z-0"
+        style={{
+          backgroundImage: `url(${dollarBill})`,
+          backgroundSize: '800px',
+          backgroundRepeat: 'repeat',
+          backgroundPosition: 'center'
+        }}
+      />
+      
+      {/* Security Lines Pattern */}
+      <div className="fixed inset-0 pointer-events-none z-0 opacity-20">
+        <div className="absolute inset-0" style={{
+          backgroundImage: 'repeating-linear-gradient(90deg, hsl(150 30% 35% / 0.1) 0px, transparent 1px, transparent 2px, hsl(150 30% 35% / 0.1) 3px)',
+        }} />
+      </div>
+
+      <div className="max-w-7xl mx-auto relative z-10">
         <Tabs defaultValue="game" className="w-full">
-          <TabsList className="grid w-full grid-cols-2 mb-6 bg-slate-800 border-slate-700">
-            <TabsTrigger value="game" className="text-white data-[state=active]:bg-blue-600">Investment Game</TabsTrigger>
-            <TabsTrigger value="achievements" className="text-white data-[state=active]:bg-purple-600">Achievements</TabsTrigger>
+          <TabsList className="grid w-full grid-cols-2 mb-6 bg-gradient-to-r from-primary to-growth-green border-2 border-[hsl(150,40%,25%)]">
+            <TabsTrigger value="game" className="text-foreground font-semibold data-[state=active]:bg-secondary data-[state=active]:text-foreground">Investment Game</TabsTrigger>
+            <TabsTrigger value="achievements" className="text-foreground font-semibold data-[state=active]:bg-accent data-[state=active]:text-accent-foreground">Achievements</TabsTrigger>
           </TabsList>
 
           <TabsContent value="game">
@@ -954,20 +972,20 @@ const StackYourFuture = () => {
                   <CardContent className="p-4">
                     <div className="space-y-3">
                       <div>
-                        <div className="text-sm opacity-90">💰 POCKET CASH</div>
-                        <div className="text-xl font-bold text-green-400">
+                        <div className="text-sm font-semibold text-primary tracking-wide">💰 POCKET CASH</div>
+                        <div className="text-xl font-bold text-growth-green">
                           ${pocketCash.toLocaleString(undefined, { minimumFractionDigits: 2 })}
                         </div>
                       </div>
                       <div>
-                        <div className="text-sm opacity-90">💎 OVERALL NET WORTH</div>
-                        <div className="text-xl font-bold text-blue-400">
+                        <div className="text-sm font-semibold text-primary tracking-wide">💎 OVERALL NET WORTH</div>
+                        <div className="text-xl font-bold text-trust-blue">
                           ${netWorth.toLocaleString(undefined, { minimumFractionDigits: 2 })}
                         </div>
                       </div>
                       <div>
-                        <div className="text-sm opacity-90">📊 EVENTS SURVIVED</div>
-                        <div className="text-lg font-bold text-purple-400">
+                        <div className="text-sm font-semibold text-primary tracking-wide">📊 EVENTS SURVIVED</div>
+                        <div className="text-lg font-bold text-vibrant-orange">
                           {eventsHandled}
                         </div>
                       </div>
@@ -976,12 +994,12 @@ const StackYourFuture = () => {
                 </Card>
 
                 {/* Navigation Links */}
-                <Card className="bg-slate-800 text-white border-slate-700">
+                <Card className="bg-gradient-to-br from-card to-secondary/20 border-2 border-primary/40 shadow-lg">
                   <CardContent className="p-4">
                     <div className="space-y-2">
                       <Button 
                         variant="ghost" 
-                        className="w-full justify-start text-white hover:bg-purple-600"
+                        className="w-full justify-start font-semibold text-foreground hover:bg-accent hover:text-accent-foreground"
                         onClick={() => setShowAchievementDialog(true)}
                       >
                         <Award className="h-4 w-4 mr-2" />
@@ -989,7 +1007,7 @@ const StackYourFuture = () => {
                       </Button>
                       <Button 
                         variant="ghost" 
-                        className="w-full justify-start text-white hover:bg-slate-600"
+                        className="w-full justify-start font-semibold text-foreground hover:bg-muted hover:text-foreground"
                         onClick={() => setShowPortfolio(true)}
                       >
                         <PieChart className="h-4 w-4 mr-2" />
