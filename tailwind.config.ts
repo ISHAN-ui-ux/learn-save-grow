@@ -114,12 +114,12 @@ export default {
 				'pulse-glow': 'pulse-glow 2s ease-in-out infinite'
 			},
 			backgroundImage: {
-				'gradient-primary': 'var(--gradient-primary)',
-				'gradient-secondary': 'var(--gradient-secondary)',
-				'gradient-kids': 'var(--gradient-kids)',
-				'gradient-trust': 'var(--gradient-trust)',
-				'gradient-subtle': 'var(--gradient-subtle)',
-				'gradient-vibrant': 'var(--gradient-vibrant)'
+				'gradient-primary': 'linear-gradient(135deg, hsl(260 100% 65%), hsl(320 95% 60%))',
+				'gradient-secondary': 'linear-gradient(135deg, hsl(180 100% 45%), hsl(220 90% 55%))',
+				'gradient-kids': 'linear-gradient(135deg, hsl(285 100% 65%), hsl(45 100% 60%))',
+				'gradient-trust': 'linear-gradient(135deg, hsl(220 90% 55%), hsl(260 100% 65%))',
+				'gradient-subtle': 'linear-gradient(180deg, hsl(0 0% 100%), hsl(260 100% 98%))',
+				'gradient-vibrant': 'linear-gradient(135deg, hsl(30 95% 55%), hsl(320 95% 60%))'
 			}
 		}
 	},
