@@ -8,44 +8,44 @@ All colors MUST be HSL.
 
 @layer base {
   :root {
-    --background: 0 0% 100%;
-    --foreground: 240 10% 15%;
+    --background: 72 35% 95%;
+    --foreground: 126 40% 12%;
 
     --card: 0 0% 100%;
-    --card-foreground: 240 10% 15%;
+    --card-foreground: 126 40% 12%;
 
     --popover: 0 0% 100%;
-    --popover-foreground: 240 10% 15%;
+    --popover-foreground: 126 40% 12%;
 
-    --primary: 260 100% 65%;
-    --primary-foreground: 0 0% 100%;
+    --primary: 126 45% 28%;
+    --primary-foreground: 72 35% 95%;
 
-    --secondary: 320 95% 60%;
-    --secondary-foreground: 0 0% 100%;
+    --secondary: 126 30% 20%;
+    --secondary-foreground: 72 35% 95%;
 
-    --muted: 240 5% 96%;
-    --muted-foreground: 240 5% 45%;
+    --muted: 72 20% 85%;
+    --muted-foreground: 126 20% 35%;
 
-    --accent: 180 100% 45%;
-    --accent-foreground: 0 0% 100%;
+    --accent: 126 35% 35%;
+    --accent-foreground: 72 35% 95%;
 
-    --kids-primary: 285 100% 65%;
-    --kids-secondary: 45 100% 60%;
-    --kids-accent: 200 100% 70%;
+    --kids-primary: 126 45% 28%;
+    --kids-secondary: 45 45% 45%;
+    --kids-accent: 126 30% 40%;
 
-    --trust-blue: 220 90% 55%;
-    --growth-green: 150 80% 45%;
-    --vibrant-orange: 30 95% 55%;
-    --electric-cyan: 180 100% 50%;
+    --trust-blue: 126 45% 28%;
+    --growth-green: 126 50% 32%;
+    --vibrant-orange: 45 60% 50%;
+    --electric-cyan: 126 40% 35%;
 
-    --destructive: 0 84% 60%;
+    --destructive: 0 65% 45%;
     --destructive-foreground: 0 0% 100%;
 
-    --border: 240 10% 90%;
-    --input: 240 10% 90%;
-    --ring: 260 100% 65%;
+    --border: 126 25% 75%;
+    --input: 126 15% 85%;
+    --ring: 126 45% 28%;
 
-    --radius: 0.75rem;
+    --radius: 0.375rem;
 
     --sidebar-background: 0 0% 98%;
 
