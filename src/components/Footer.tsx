@@ -11,7 +11,7 @@ const Footer = () => {
               <div className="w-8 h-8 bg-gradient-primary rounded-lg flex items-center justify-center">
                 <span className="text-white font-bold text-lg">$</span>
               </div>
-              <span className="text-xl font-bold">GreenbackU</span>
+              <span className="text-xl font-bold">MoneyMatrix</span>
             </div>
             <p className="text-background/70">
               Making financial education accessible and fun for everyone, from kids to adults.
@@ -60,7 +60,7 @@ const Footer = () => {
 
         <div className="border-t border-background/20 pt-8 text-center">
           <p className="text-background/70">
-            © 2024 GreenbackU. All rights reserved. Building financial literacy one person at a time.
+            © 2024 MoneyMatrix. All rights reserved. Building financial literacy one person at a time.
           </p>
         </div>
       </div>
