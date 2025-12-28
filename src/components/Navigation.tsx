@@ -29,7 +29,7 @@ const Navigation = () => {
             <div className="w-8 h-8 bg-primary border border-primary flex items-center justify-center">
               <span className="text-primary-foreground font-bold text-lg">$</span>
             </div>
-            <span className="text-xl font-bold text-foreground">GreenbackU</span>
+            <span className="text-xl font-bold text-foreground">MoneyMatrix</span>
           </Link>
 
           {/* Desktop Navigation */}
